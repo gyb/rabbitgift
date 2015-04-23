@@ -17,6 +17,7 @@ import net.sf.cglib.beans.BeanMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -249,7 +250,11 @@ public abstract class JdbcDao<T extends IdEntity> implements Dao<T> {
     public T findByUnique(final String propertyName, final Object value) {
         Assert.hasText(propertyName, "propertyName cannot be null");
     	String sql = "select * from " + tableName +  " where " + convertPascalOrCamelToUnderscore(propertyName) + " = ?";
-    	return jdbcTpl.queryForObject(sql, rowMapper, value);
+    	try {
+    		return jdbcTpl.queryForObject(sql, rowMapper, value);
+    	} catch(DataAccessException e) {
+    		return null;
+    	}
     }
 
     /**
@@ -267,7 +272,11 @@ public abstract class JdbcDao<T extends IdEntity> implements Dao<T> {
     		}
     		sql.append(convertPascalOrCamelToUnderscore(name)).append(" = ?");
     	}
-    	return jdbcTpl.queryForObject(sql.toString(), rowMapper, values);
+    	try {
+    		return jdbcTpl.queryForObject(sql.toString(), rowMapper, values);
+    	} catch(DataAccessException e) {
+    		return null;
+    	}
     }
 
     /**

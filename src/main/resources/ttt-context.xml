@@ -136,7 +136,7 @@
     <property name="targetMethod" value="createUploadPath" />
     <property name="concurrent" value="false" />
   </bean>
-  <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+  <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
     <property name="jobDetail" ref="jobDetail" />
     <property name="cronExpression" value="0 0 * * * ?" />
   </bean>

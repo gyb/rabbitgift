@@ -31,7 +31,7 @@
 <div id="content">
 <div class="title">商品精选</div>
 <ol id="goodslist">
-<c:forEach items="${page.page}" var="goods">
+<c:forEach items="${page.content}" var="goods">
 	<li><a href="<c:url value="/goods/${goods.id}" />"><img src="<c:url value="${goods.picUrl}" />" height="130" width="130"/><br/><span>${goods.name}</span></a></li>
 </c:forEach>
 </ol>

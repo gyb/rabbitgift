@@ -75,9 +75,9 @@ public class OrderService {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.CREATED) return null;
 
-		Account account = accountDao.get(order.getBuyerId());
+		Account account = accountDao.findOne(order.getBuyerId());
 		if (!account.freeze(order.getMoney())) return null;
-		accountDao.update(account);
+		accountDao.save(account);
 		
 		order.setState(Order.State.PAYED);
 		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
@@ -157,9 +157,9 @@ public class OrderService {
 		if (order.getState() != Order.State.PAYED
 				&& order.getState() != Order.State.DELIVERED) return null;
 
-		Account account = accountDao.get(order.getBuyerId());
+		Account account = accountDao.findOne(order.getBuyerId());
 		account.refund(order.getMoney());
-		accountDao.update(account);
+		accountDao.save(account);
 		
 		order.setState(Order.State.REFUNDED);
 		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
@@ -181,12 +181,12 @@ public class OrderService {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.DELIVERED) return null;
 
-		Account buyer = accountDao.get(order.getBuyerId());
+		Account buyer = accountDao.findOne(order.getBuyerId());
 		buyer.confirmPay(order.getMoney());
-		accountDao.update(buyer);
-		Account seller = accountDao.get(order.getSellerId());
+		accountDao.save(buyer);
+		Account seller = accountDao.findOne(order.getSellerId());
 		seller.receivePay(order.getMoney());
-		accountDao.update(seller);
+		accountDao.save(seller);
 		
 		order.setState(Order.State.RECEIVED);
 		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));

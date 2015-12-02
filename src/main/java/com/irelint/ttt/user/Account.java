@@ -1,11 +1,19 @@
 package com.irelint.ttt.user;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Version;
+
 import org.springframework.util.Assert;
 
+@Entity
 public class Account {
+	@Id
 	private long userId;
 	private long totalBalance;
 	private long availableBalance;
+
+	@Version
 	private int version;
 	
 	public void deposit(long money) {

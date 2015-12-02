@@ -88,7 +88,7 @@ public class MyShopController {
 		return "myshop/upload_success";
 	}
 	
-	@RequestMapping(value="/createdPage/{pageNo}")
+	@RequestMapping(value="/createdPage")
 	@LoginRequired
 	public String createdGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");
@@ -185,7 +185,7 @@ public class MyShopController {
 		}
 	}
 	
-	@RequestMapping(value="/orders/{pageNo}", method=RequestMethod.GET) 
+	@RequestMapping(value="/orders", method=RequestMethod.GET) 
 	@LoginRequired
 	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");

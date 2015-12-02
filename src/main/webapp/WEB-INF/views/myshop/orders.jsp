@@ -23,7 +23,7 @@
 <table>
 <thead><tr><th>编号</th><th>状态</th><th>时间</th><th>买家</th><th colspan="2">商品</th><th>单价</th><th>个数</th><th>总计</th><th>收货信息</th><th>操作</th></tr></thead>
 <tbody>
-<c:forEach items="${page.page}" var="order">
+<c:forEach items="${page.content}" var="order">
 <tr>
 <td><a href="<c:url value="/order/history/${order.id}"/>">${order.id}</a></td>
 <td><c:choose><c:when test="${order.state=='CREATED'}">未支付</c:when>

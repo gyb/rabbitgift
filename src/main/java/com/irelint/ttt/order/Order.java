@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -48,8 +49,11 @@ public class Order implements Serializable {
 	@Column private Timestamp lastUpdateTime;
 	@Version private int version;
 	
+	@Transient
 	private Goods goods;
+	@Transient
 	private User buyer;
+	@Transient
 	private User seller;
 	
 	public enum State {

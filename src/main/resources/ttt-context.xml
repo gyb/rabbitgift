@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  	xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
-  	xmlns:tx="http://www.springframework.org/schema/tx"
-  	xmlns:util="http://www.springframework.org/schema/util"
-  	xmlns:cache="http://www.springframework.org/schema/cache"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
-		http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
-  		http://www.springframework.org/schema/aop 
-  		http://www.springframework.org/schema/aop/spring-aop-3.1.xsd 
-		http://www.springframework.org/schema/beans 
-		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.springframework.org/schema/context 
-		http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xmlns:cache="http://www.springframework.org/schema/cache"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:util="http://www.springframework.org/schema/util"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop 
+  		http://www.springframework.org/schema/aop/spring-aop.xsd 
 		http://www.springframework.org/schema/tx 
-  		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd 
-		http://www.springframework.org/schema/util 
-  		http://www.springframework.org/schema/util/spring-util-3.1.xsd
-  		http://www.springframework.org/schema/cache 
-  		http://www.springframework.org/schema/cache/spring-cache-3.1.xsd"
-  	default-lazy-init="true">
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/data/jpa
+        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/cache
+        http://www.springframework.org/schema/cache/spring-cache.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd"
+	default-lazy-init="true">
 
     <aop:aspectj-autoproxy />
     
 	<!-- Scans the classpath of this application for @Components to deploy as beans -->
-	<context:component-scan base-package="dreamsky.ttt" />
+	<context:component-scan base-package="com.irelint.ttt" />
 
 	<!-- Configures the @Controller programming model -->
 	<mvc:annotation-driven />
@@ -62,37 +67,58 @@
 	</bean>
 
   <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-  	<property name="maxUploadSize" value="500000" />
+  	<property name="maxUploadSize" value="10000000" />
   </bean>
 	
   <context:property-placeholder location="classpath:ttt.properties"/>
 
-  <util:properties id="dgwarProperties" location="classpath:ttt.properties"/>
+  <util:properties id="tttProperties" location="classpath:ttt.properties"/>
 
-  <!-- 数据源配置,使用应用内的DBCP数据库连接池 -->
-  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-    <!-- Connection Info -->
-    <property name="driverClassName" value="${jdbc.driver}" />
-    <property name="url" value="${jdbc.url}" />
-    <property name="username" value="${jdbc.username}" />
-    <property name="password" value="${jdbc.password}" />
+    <!-- 数据源配置，使用Tomcat JDBC -->
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+        <!-- Connection Info-->
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
 
-    <!-- Connection Pooling Info -->
-    <property name="initialSize" value="2" />
-    <property name="maxActive" value="30" />
-    <property name="maxIdle" value="10" />
-    <property name="maxWait" value="1000" />
-    <property name="poolPreparedStatements" value="true" />
-    <property name="defaultAutoCommit" value="false" />
-  </bean>
+        <!-- Connection Pooling Info -->
+        <property name="initialSize" value="${jdbc.pool.initialSize}" />
+        <property name="maxActive" value="${jdbc.pool.maxActive}" />
+        <property name="minIdle" value="${jdbc.pool.minIdle}" />
+        <property name="maxIdle" value="${jdbc.pool.maxIdle}" />
+        <property name="maxWait" value="${jdbc.pool.maxWait}" />
 
-  <!-- 事务管理器配置,单数据源事务 -->
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="dataSource" />
-  </bean>
+        <property name="testOnBorrow" value="true" />
+        <property name="validationQuery" value="select 1" />
+        <property name="validationInterval" value="30000" />
+    </bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />    
+	</bean>
 
-  <!-- 使用annotation定义事务 -->
-  <tx:annotation-driven transaction-manager="transactionManager" order="10"/>
+    <!-- enables scanning for @Transactional annotations -->
+	<tx:annotation-driven proxy-target-class="true"/>
+
+	<!-- Jpa  -->
+	<jpa:repositories base-package="com.irelint.stanley" />
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.irelint.stanley" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+		</property>
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<!-- 支持数据库字段大写转下划线 -->
+				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+			</props>
+		</property>
+	</bean>  
   
   <!-- Cache Definition -->
   <cache:annotation-driven/>

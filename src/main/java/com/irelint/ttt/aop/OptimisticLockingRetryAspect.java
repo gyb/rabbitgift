@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OptimisticLockingRetryAspect implements Ordered {
 	private static final Logger logger = LoggerFactory.getLogger(OptimisticLockingRetryAspect.class);
-	private static final int DEFAULT_MAX_RETRIES = 2;
+	private static final int DEFAULT_MAX_RETRIES = 3;
 
 	private int maxRetries = DEFAULT_MAX_RETRIES;
 	private int order = 1;
@@ -41,10 +41,10 @@ public class OptimisticLockingRetryAspect implements Ordered {
 		do {
 			numAttempts++;
 			try {
-				logger.debug("-------------------aop start -----------------------");
+				logger.debug("-------------------OptimisticLock start -----------------------");
 				return pjp.proceed();
 			} catch (OptimisticLockingFailureException ex) {
-				logger.debug("---------------------catch exception--------------");
+				logger.debug("------------------catch OptimisticLockingFailureException--------------");
 				lockFailureException = ex;
 			}
 		} while (numAttempts <= this.maxRetries);

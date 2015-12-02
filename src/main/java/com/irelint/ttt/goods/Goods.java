@@ -1,21 +1,28 @@
 package com.irelint.ttt.goods;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Version;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import com.irelint.ttt.dao.Column;
-import com.irelint.ttt.dao.VersionIdEntity;
-
-public class Goods implements VersionIdEntity {
+@Entity
+public class Goods implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	@Column private Long id;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
 	
 	@Column
 	@NotNull private Long userId;
@@ -52,7 +59,7 @@ public class Goods implements VersionIdEntity {
 	@Column private int ratingStars4;
 	@Column private int ratingStars5;
 	
-	@Column private int version;
+	@Version private int version;
 	
 	public boolean isOnline() {
 		return state == State.ONLINE;

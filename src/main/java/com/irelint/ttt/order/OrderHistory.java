@@ -1,15 +1,22 @@
 package com.irelint.ttt.order;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-import com.irelint.ttt.dao.Column;
-import com.irelint.ttt.dao.IdEntity;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import com.irelint.ttt.user.User;
 
-public class OrderHistory implements IdEntity {
+public class OrderHistory implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	@Column private Long id;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+	
 	@Column private Long orderId;
 	@Column private Long userId;
 	@Column private Type type;

@@ -1,19 +1,28 @@
 package com.irelint.ttt.order;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Version;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import com.irelint.ttt.dao.Column;
-import com.irelint.ttt.dao.VersionIdEntity;
 import com.irelint.ttt.goods.Goods;
 import com.irelint.ttt.user.User;
 
-public class Order implements VersionIdEntity {
+@Entity
+public class Order implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	@Column private Long id;
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
 
 	@NotNull
 	@Column private Long buyerId;
@@ -37,7 +46,7 @@ public class Order implements VersionIdEntity {
 	
 	@Column private State state = State.CREATED;
 	@Column private Timestamp lastUpdateTime;
-	@Column private int version;
+	@Version private int version;
 	
 	private Goods goods;
 	private User buyer;

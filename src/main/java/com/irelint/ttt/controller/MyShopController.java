@@ -6,11 +6,12 @@ import java.io.IOException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -69,7 +70,7 @@ public class MyShopController {
 		} else {
 			try {
 				File file = new File(imagePathGen.getUploadFilePath() + fileName);
-				FileUtils.writeByteArrayToFile(file, image.getBytes());
+				image.transferTo(file);
 			} catch (IOException e) {
 				result.reject("Unable to save image");
 			}
@@ -89,9 +90,9 @@ public class MyShopController {
 	
 	@RequestMapping(value="/createdPage/{pageNo}")
 	@LoginRequired
-	public String createdGoodsPage(@PathVariable int pageNo, Model model, HttpSession session) {
+	public String createdGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		model.addAttribute("page", goodsService.findCreatedPage(user.getId(), pageNo, PAGE_SIZE));
+		model.addAttribute("page", goodsService.findCreatedPage(user.getId(), pageable));
 		return "myshop/created";
 	}
 	
@@ -134,11 +135,11 @@ public class MyShopController {
 		}
 	}
 	
-	@RequestMapping(value="/onlinePage/{pageNo}")
+	@RequestMapping(value="/onlinePage")
 	@LoginRequired
-	public String onlineGoodsPage(@PathVariable int pageNo, Model model, HttpSession session) {
+	public String onlineGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		model.addAttribute("page", goodsService.findOnlinePage(user.getId(), pageNo, PAGE_SIZE));
+		model.addAttribute("page", goodsService.findOnlinePage(user.getId(), pageable));
 		return "myshop/online";
 	}
 	
@@ -159,11 +160,11 @@ public class MyShopController {
 		}
 	}
 	
-	@RequestMapping(value="/offlinePage/{pageNo}")
+	@RequestMapping(value="/offlinePage")
 	@LoginRequired
-	public String offlineGoodsPage(@PathVariable int pageNo, Model model, HttpSession session) {
+	public String offlineGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		model.addAttribute("page", goodsService.findOfflinePage(user.getId(), pageNo, PAGE_SIZE));
+		model.addAttribute("page", goodsService.findOfflinePage(user.getId(), pageable));
 		return "myshop/offline";
 	}
 	
@@ -186,9 +187,9 @@ public class MyShopController {
 	
 	@RequestMapping(value="/orders/{pageNo}", method=RequestMethod.GET) 
 	@LoginRequired
-	public String myOrders(@PathVariable int pageNo, Model model, HttpSession session) {
+	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		model.addAttribute("page", orderService.findSellerOrders(user.getId(), pageNo, ORDER_PAGE_SIZE));
+		model.addAttribute("page", orderService.findSellerOrders(user.getId(), pageable));
 		return "myshop/orders";
 	}
 }

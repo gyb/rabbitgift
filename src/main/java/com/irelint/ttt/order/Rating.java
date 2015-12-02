@@ -1,16 +1,17 @@
 package com.irelint.ttt.order;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.irelint.ttt.dao.Column;
-import com.irelint.ttt.dao.IdEntity;
-
-public class Rating implements IdEntity {
+@Entity
+public class Rating implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Column private Long id;

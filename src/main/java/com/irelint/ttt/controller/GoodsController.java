@@ -2,6 +2,9 @@ package com.irelint.ttt.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +16,6 @@ import com.irelint.ttt.goods.Goods;
 import com.irelint.ttt.goods.GoodsService;
 import com.irelint.ttt.order.Rating;
 import com.irelint.ttt.user.UserService;
-import com.irelint.ttt.util.PageList;
 
 @Controller
 @RequestMapping("/goods")
@@ -38,11 +40,11 @@ public class GoodsController {
 		return "goods/goods";
 	}
 
-	private static int RATING_PAGE_SIZE = 10;
+	private final int RATING_PAGE_SIZE = 10;
 	
-	@RequestMapping("/{id}/rating/page/{pageNo}")
-	public @ResponseBody PageList<Rating> findRatings(@PathVariable Long id, 
-			@PathVariable int pageNo, Model model) {
-		return goodsService.findRatings(id, pageNo, RATING_PAGE_SIZE);
+	@RequestMapping("/{id}/rating/page")
+	public @ResponseBody Page<Rating> findRatings(@PathVariable Long id, 
+			@PageableDefault(size=RATING_PAGE_SIZE) Pageable pageable, Model model) {
+		return goodsService.findRatings(id, pageable);
 	}
 }

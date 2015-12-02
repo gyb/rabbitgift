@@ -6,6 +6,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -73,11 +75,11 @@ public class MytttController {
 		return "redirect:/myttt/address";
 	}
 	
-	@RequestMapping(value="/orders/{pageNo}", method=RequestMethod.GET) 
+	@RequestMapping(value="/orders", method=RequestMethod.GET) 
 	@LoginRequired
-	public String myOrders(@PathVariable int pageNo, Model model, HttpSession session) {
+	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		model.addAttribute("page", orderService.findBuyerOrders(user.getId(), pageNo, ORDER_PAGE_SIZE));
+		model.addAttribute("page", orderService.findBuyerOrders(user.getId(), pageable));
 		return "myttt/orders";
 	}
 }

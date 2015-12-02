@@ -102,10 +102,10 @@
 	<tx:annotation-driven proxy-target-class="true"/>
 
 	<!-- Jpa  -->
-	<jpa:repositories base-package="com.irelint.stanley" />
+	<jpa:repositories base-package="com.irelint.ttt" />
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<property name="packagesToScan" value="com.irelint.stanley" />
+		<property name="packagesToScan" value="com.irelint.ttt" />
 		<property name="jpaVendorAdapter">
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
 		</property>

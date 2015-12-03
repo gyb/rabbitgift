@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.irelint.ttt.aop.LoginRequired;
+import com.irelint.ttt.goods.Goods;
 import com.irelint.ttt.goods.GoodsService;
 import com.irelint.ttt.order.Order;
 import com.irelint.ttt.order.OrderService;
@@ -39,8 +40,8 @@ public class OrderController {
 		
 		Order order = new Order();
 		order.setNum(1);
-		order.setBuyerId(user.getId());
-		order.setGoodsId(goodsId);
+		order.setBuyer(new User(user.getId()));
+		order.setGoods(new Goods(goodsId));
 		model.addAttribute("order", order);
 		return "order/create_order";
 	}
@@ -54,7 +55,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", orderService.create(order));
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/create_success";
 	}
 	
@@ -69,7 +70,7 @@ public class OrderController {
 		User user = (User)session.getAttribute("user");
 		model.addAttribute("account", accountService.get(user.getId()));
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/pay";
 	}
 	
@@ -82,7 +83,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/pay_success";
 	}
 	
@@ -95,7 +96,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/cancel";
 	}
 	
@@ -108,7 +109,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/cancel_success";
 	}
 	
@@ -121,7 +122,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/deliver";
 	}
 	
@@ -134,7 +135,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/deliver_success";
 	}
 	
@@ -147,7 +148,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/refund";
 	}
 	
@@ -160,7 +161,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/refund_success";
 	}
 	
@@ -173,7 +174,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/receive";
 	}
 	
@@ -186,7 +187,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/receive_success";
 	}
 	
@@ -199,13 +200,13 @@ public class OrderController {
 		}
 		
 		Rating rating = new Rating();
-		rating.setGoodsId(order.getGoodsId());
+		rating.setGoodsId(order.getGoods().getId());
 		rating.setOrderId(orderId);
-		rating.setUserId(((User)session.getAttribute("user")).getId());
+		rating.setUser((User)session.getAttribute("user"));
 		model.addAttribute(rating);
 
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/rate";
 	}
 	
@@ -225,7 +226,7 @@ public class OrderController {
 		}
 		
 		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
+		model.addAttribute("goods", goodsService.get(order.getGoods().getId()));
 		return "order/rate_success";
 	}
 	

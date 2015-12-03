@@ -1,4 +1,4 @@
-package com.irelint.ttt.order;
+  package com.irelint.ttt.order;    
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -17,6 +19,7 @@ import com.irelint.ttt.goods.Goods;
 import com.irelint.ttt.user.User;
 
 @Entity
+@Table(name="orders")
 public class Order implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -26,14 +29,20 @@ public class Order implements Serializable {
 	private Long id;
 
 	@NotNull
-	@Column private Long buyerId;
+	@ManyToOne
+	@JoinColumn(name="buyer_id")
+	private User buyer;
 	
-	@Column private Long sellerId;
+	@ManyToOne
+	@JoinColumn(name="seller_id")
+	private User seller;
 
 	@Column private long money;
 	
 	@NotNull
-	@Column private Long goodsId;
+	@ManyToOne
+	@JoinColumn(name="goods_id")
+	private Goods goods;
 
 	@Min(1)
 	@Column private int num;
@@ -48,13 +57,6 @@ public class Order implements Serializable {
 	@Column private State state = State.CREATED;
 	@Column private Timestamp lastUpdateTime;
 	@Version private int version;
-	
-	@Transient
-	private Goods goods;
-	@Transient
-	private User buyer;
-	@Transient
-	private User seller;
 	
 	public enum State {
 		CREATED, PAYED, DELIVERED, RECEIVED, COMPLETED, CANCELED, REFUNDED
@@ -72,29 +74,11 @@ public class Order implements Serializable {
 	public void setVersion(int version) {
 		this.version = version;
 	}
-	public Long getBuyerId() {
-		return buyerId;
-	}
-	public void setBuyerId(Long buyerId) {
-		this.buyerId = buyerId;
-	}
-	public Long getSellerId() {
-		return sellerId;
-	}
-	public void setSellerId(Long sellerId) {
-		this.sellerId = sellerId;
-	}
 	public long getMoney() {
 		return money;
 	}
 	public void setMoney(long money) {
 		this.money = money;
-	}
-	public Long getGoodsId() {
-		return goodsId;
-	}
-	public void setGoodsId(Long goodsId) {
-		this.goodsId = goodsId;
 	}
 	public int getNum() {
 		return num;

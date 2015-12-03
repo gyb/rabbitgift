@@ -61,6 +61,12 @@ public class Goods implements Serializable {
 	
 	@Version private int version;
 	
+	public Goods() {}
+	
+	public Goods(Long id) {
+		this.id = id;
+	}
+	
 	public boolean isOnline() {
 		return state == State.ONLINE;
 	}

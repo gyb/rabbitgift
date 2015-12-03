@@ -15,6 +15,7 @@ import com.irelint.ttt.goods.Goods;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.user.Account;
 import com.irelint.ttt.user.AccountDao;
+import com.irelint.ttt.user.User;
 import com.irelint.ttt.user.UserDao;
 
 @Service
@@ -28,10 +29,10 @@ public class OrderService {
 
 	@Transactional
 	@OptimisticLockRetry
-	@CacheEvict(value="goods", key="#order.goodsId")
+	@CacheEvict(value="goods", key="#order.goods.id")
 	public Order create(Order order) {
 		//validate order
-		Goods goods = goodsDao.findOne(order.getGoodsId());
+		Goods goods = goodsDao.findOne(order.getGoods().getId());
 		if (!goods.isOnline()) {
 			throw new GoodsNotOnlineException();
 		}
@@ -43,7 +44,7 @@ public class OrderService {
 		goods.setSelledNumber(goods.getSelledNumber() + order.getNum());
 		goodsDao.save(goods);
 		
-		order.setSellerId(goods.getUserId());
+		order.setSeller(new User(goods.getUserId()));
 		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 		order.setMoney(goods.getPrice() * order.getNum());
 		orderDao.save(order);
@@ -51,7 +52,7 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
+		history.setUser(order.getBuyer());
 		history.setType(OrderHistory.Type.CREATE);
 		orderHistoryDao.save(history);
 		
@@ -75,7 +76,7 @@ public class OrderService {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.CREATED) return null;
 
-		Account account = accountDao.findOne(order.getBuyerId());
+		Account account = accountDao.findOne(order.getBuyer().getId());
 		if (!account.freeze(order.getMoney())) return null;
 		accountDao.save(account);
 		
@@ -86,7 +87,7 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
+		history.setUser(order.getBuyer());
 		history.setType(OrderHistory.Type.PAY);
 		orderHistoryDao.save(history);
 		
@@ -114,17 +115,16 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getSellerId());
+		history.setUser(order.getSeller());
 		history.setType(OrderHistory.Type.CANCEL);
 		orderHistoryDao.save(history);
 		
 		return order;
 	}
 
-	//FIXME Cache annotation doesn't work on private methods
-	@CacheEvict(value="goods", key="#order.goodsId")
-	private void updateGoodsForCancelOrder(Order order) {
-		Goods goods = goodsDao.findOne(order.getGoodsId());
+	@CacheEvict(value="goods", key="#order.goods.id")
+	protected void updateGoodsForCancelOrder(Order order) {
+		Goods goods = goodsDao.findOne(order.getGoods().getId());
 		goods.setAvailableNumber(goods.getAvailableNumber() + order.getNum());
 		goods.setSelledNumber(goods.getSelledNumber() - order.getNum());
 		goodsDao.save(goods);
@@ -143,7 +143,7 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getSellerId());
+		history.setUser(order.getSeller());
 		history.setType(OrderHistory.Type.DELIVER);
 		orderHistoryDao.save(history);
 		
@@ -157,7 +157,7 @@ public class OrderService {
 		if (order.getState() != Order.State.PAYED
 				&& order.getState() != Order.State.DELIVERED) return null;
 
-		Account account = accountDao.findOne(order.getBuyerId());
+		Account account = accountDao.findOne(order.getBuyer().getId());
 		account.refund(order.getMoney());
 		accountDao.save(account);
 		
@@ -168,7 +168,7 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getSellerId());
+		history.setUser(order.getSeller());
 		history.setType(OrderHistory.Type.REFUND);
 		orderHistoryDao.save(history);
 		
@@ -181,10 +181,10 @@ public class OrderService {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.DELIVERED) return null;
 
-		Account buyer = accountDao.findOne(order.getBuyerId());
+		Account buyer = accountDao.findOne(order.getBuyer().getId());
 		buyer.confirmPay(order.getMoney());
 		accountDao.save(buyer);
-		Account seller = accountDao.findOne(order.getSellerId());
+		Account seller = accountDao.findOne(order.getSeller().getId());
 		seller.receivePay(order.getMoney());
 		accountDao.save(seller);
 		
@@ -195,7 +195,7 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
+		history.setUser(order.getBuyer());
 		history.setType(OrderHistory.Type.RECEIVE);
 		orderHistoryDao.save(history);
 		
@@ -226,7 +226,7 @@ public class OrderService {
 		OrderHistory history = new OrderHistory();
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
+		history.setUser(order.getBuyer());
 		history.setType(OrderHistory.Type.COMPLETE);
 		orderHistoryDao.save(history);
 		
@@ -241,9 +241,9 @@ public class OrderService {
 	@Transactional(readOnly=true)
 	public Order findDetail(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		order.setGoods(goodsDao.findOne(order.getGoodsId()));
-		order.setBuyer(userDao.findOne(order.getBuyerId()));
-		order.setSeller(userDao.findOne(order.getSellerId()));
+		order.setGoods(goodsDao.findOne(order.getGoods().getId()));
+		order.setBuyer(userDao.findOne(order.getBuyer().getId()));
+		order.setSeller(userDao.findOne(order.getSeller().getId()));
 		return order;
 	}
 }

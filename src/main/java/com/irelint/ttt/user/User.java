@@ -42,6 +42,12 @@ public class User implements Serializable {
 	@Size(min=6, max=30)
 	private String password;
 	
+	public User() {}
+	
+	public User(Long id) {
+		this.id = id;
+	}
+	
 	public void setPassword(String password) {
 		this.password = password;
 		this.passwordMd5 = md5Pass(password);

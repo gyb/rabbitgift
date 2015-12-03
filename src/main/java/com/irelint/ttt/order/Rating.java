@@ -8,10 +8,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.irelint.ttt.user.User;
 
 @Entity
 public class Rating implements Serializable {
@@ -28,7 +32,9 @@ public class Rating implements Serializable {
 	@Column private Long orderId;
 	
 	@NotNull
-	@Column private Long userId;
+	@ManyToOne
+	@JoinColumn(name="user_id")
+	private User user;
 	
 	@Column private Timestamp ratingTime;
 	
@@ -42,8 +48,6 @@ public class Rating implements Serializable {
 	@Column private Timestamp buyTime;
 	@Column private long buyPrice;
 	
-	private String login;
-
 	public Long getId() {
 		return id;
 	}
@@ -68,12 +72,12 @@ public class Rating implements Serializable {
 		this.orderId = orderId;
 	}
 
-	public Long getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Timestamp getRatingTime() {
@@ -114,13 +118,5 @@ public class Rating implements Serializable {
 
 	public void setBuyPrice(long buyPrice) {
 		this.buyPrice = buyPrice;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String login) {
-		this.login = login;
 	}
 }

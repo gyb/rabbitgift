@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import com.irelint.ttt.user.User;
 
@@ -20,10 +22,11 @@ public class OrderHistory implements Serializable {
 	private Long id;
 	
 	@Column private Long orderId;
-	@Column private Long userId;
 	@Column private Type type;
 	@Column private Timestamp time;
 	
+	@ManyToOne
+	@JoinColumn(name="user_id")
 	private User user;
 	
 	public enum Type {
@@ -44,14 +47,6 @@ public class OrderHistory implements Serializable {
 
 	public void setOrderId(Long orderId) {
 		this.orderId = orderId;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public Type getType() {

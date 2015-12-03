@@ -56,7 +56,7 @@ $(function() {
 <c:url value="/order/rate" var="rateUrl"/>
 <form:form modelAttribute="rating" method="post" action="${rateUrl}">
 <form:errors path="" />
-<form:hidden path="userId" />
+<form:hidden path="user.id" />
 <form:hidden path="orderId" />
 <form:hidden path="goodsId" />
 <p>

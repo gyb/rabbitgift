@@ -11,23 +11,22 @@
 <script src="<c:url value="/resources/js/jquery-1.7.1.min.js" />" type="text/javascript"></script>
 <script>
 $(function() {
-	getRating("<c:url value="/goods/${goods.id}/rating/page/"/>", 1);
+	getRating("<c:url value="/goods/${goods.id}/rating/page"/>", 1);
 });
 var getRating = function(url, pageNo) {
-	var base = "<c:url value="/"/>";
-	$.getJSON(url + pageNo, function(data) {
+	$.getJSON(url + "?page=" + (pageNo-1), function(data) {
 		$("#rating_list").empty();
-		$.each(data.page, function(k, v) {
+		$.each(data.content, function(k, v) {
 			var buydate = new Date(v.buyTime).toLocaleDateString();
 			var ratedate = new Date(v.ratingTime).toLocaleDateString();
-			var rating = "<tr>" + "<td><span class=\"stars stars-" + v.number + "\"></span></td><td>" + ratedate + "</td><td>" + v.login + "</td><td>" + v.comment + "</td><td>" + v.buyPrice + "元</td><td>" + buydate + "</td></tr>";
+			var rating = "<tr>" + "<td><span class=\"stars stars-" + v.number + "\"></span></td><td>" + ratedate + "</td><td>" + v.user.login + "</td><td>" + v.comment + "</td><td>" + v.buyPrice + "元</td><td>" + buydate + "</td></tr>";
 			$("#rating_list").append(rating);
 		});
 		$("#page").empty();
-		var page = " 总" + data.total + "页 第<input id='currentPageNo' value='" + pageNo + "'/>页 <input type='button' value='go' onclick='gotoPage()'/> ";
-		if (data.hasPrev) $("#page").append("<a href='#' onclick='getRating(\"" + base + data.pageUrl + "\"," + data.prevNo + ")'>&lt;&lt;上页</a>");
+		var page = " 总" + data.totalPages + "页 第<input id='currentPageNo' value='" + (data.number+1) + "'/>页 <input type='button' value='go' onclick='gotoPage()'/> ";
+		if (!data.first) $("#page").append("<a href='#' onclick='getRating(\"" + url + "\"," + data.number + ")'>&lt;&lt;上页</a>");
 		$("#page").append(page);
-		if (data.hasNext) $("#page").append("<a href='#' onclick='getRating(\"" + base + data.pageUrl + "\"," + data.nextNo + ")'>下页&gt;&gt;</a>");
+		if (!data.last) $("#page").append("<a href='#' onclick='getRating(\"" + url + "\"," + (data.number+2) + ")'>下页&gt;&gt;</a>");
 	});
 };
 var gotoPage = function() {

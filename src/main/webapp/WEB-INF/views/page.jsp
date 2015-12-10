@@ -3,12 +3,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <div id="page">
 <c:if test="${!page.first}"><a href="#" onclick="gotoPage(${page.number-1})">&lt;&lt;上页</a></c:if>
- 总${page.totalPages}页 第<input value="${page.number}" id="currentPageNo"/>页 <input type="button" value="go" onclick="gotoCurrentPage();"/>
+ 总${page.totalPages}页 第<input value="${page.number+1}" id="currentPageNo"/>页 <input type="button" value="go" onclick="gotoCurrentPage();"/>
 <c:if test="${!page.last}"><a href="#" onclick="gotoPage(${page.number+1})">下页&gt;&gt;</a></c:if>
 </div>
 <script>
 function gotoCurrentPage() {
-	gotoPage($("#currentPageNo").val());
+	gotoPage(document.getElementById("currentPageNo").value - 1);
 }
 function gotoPage(page) {
 	changeParameters({"page":page})
@@ -38,6 +38,8 @@ function changeParameters(params) {
 	 * jQuery.param() -> create a serialized representation of an array or
 	 *     object, suitable for use in a URL query string or Ajax request.
 	 */
-	location.search = $.param(queryParameters); // Causes page to reload
+	location.search = Object.keys(queryParameters).map(function(k) {
+	    return encodeURIComponent(k) + '=' + encodeURIComponent(queryParameters[k])
+	}).join('&');
 }
 </script>

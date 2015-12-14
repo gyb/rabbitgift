@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.irelint.ttt</groupId>
+		<artifactId>ttt-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../../parent/</relativePath>
+	</parent>
+	<artifactId>ttt-core-application</artifactId>
+	<packaging>jar</packaging>
+	<name>ttt :: core-application</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-user</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-account</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-product</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-order</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-inventory</artifactId>
+			<version>${version}</version>
+		</dependency>
+	</dependencies>
+</project>

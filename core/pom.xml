@@ -6,16 +6,18 @@
 		<groupId>com.irelint.ttt</groupId>
 		<artifactId>ttt-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>parent/</relativePath>
+		<relativePath>../parent/</relativePath>
 	</parent>	
-	<artifactId>ttt-modules</artifactId>
-	<name>ttt :: modules</name>
+	<artifactId>ttt-core</artifactId>
+	<name>ttt :: core</name>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>parent</module>
-		<module>common</module>
-		<module>core</module>
-		<module>web</module>
+		<module>core-user</module>
+		<module>core-account</module>
+		<module>core-product</module>
+		<module>core-order</module>
+		<module>core-inventory</module>
+		<module>core-application</module>
 	</modules>
 </project>

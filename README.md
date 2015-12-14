@@ -1,4 +1,4 @@
 rabbitgift
 ==========
 
-因为老婆要学习测试技术，需要找个东西练手，所以随意写的一个web应用。
+按照DDD的思想，拆分成若干个Bounded Context

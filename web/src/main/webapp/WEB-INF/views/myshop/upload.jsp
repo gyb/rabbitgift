@@ -42,14 +42,10 @@
 <form:input path="price"/> 元 <form:errors path="price" />
 </p>
 <p>
-<form:label for="availableNumber" path="availableNumber" cssErrorClass="error">库存数量</form:label><br/>
-<form:input path="availableNumber"/><form:errors path="availableNumber" />
-</p>
-<p>
 <label for="image">上传图片</label><br/>
 <input name="image" type="file"/>
 </p>
-<form:hidden path="userId"/>
+<form:hidden path="ownerId"/>
 <input type="submit" value="确定"/>
 </form:form>
 </div>

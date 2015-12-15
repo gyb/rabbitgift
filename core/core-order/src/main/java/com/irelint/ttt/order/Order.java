@@ -26,7 +26,6 @@ public class Order implements Serializable {
 	@NotNull
 	private Long buyerId;
 	
-	@ManyToOne
 	private Long sellerId;
 
 	private long money;

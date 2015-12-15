@@ -113,8 +113,8 @@ var gotoPage = function() {
 <p>
 类别：${category}<br/>
 价格：${goods.price}元<br/>
-剩余数量：${goods.availableNumber}个<br/>
-已售出：${goods.selledNumber}个
+剩余数量：${inventory.availableNumber}个<br/>
+已售出：${inventory.selledNumber}个
 <c:if test="${goods.state!='CREATED'}">
 <br/>上架时间: <fmt:formatDate value="${goods.onlineTime}" type="both"/>
 </c:if>

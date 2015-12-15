@@ -1,5 +1,6 @@
 <%@page contentType="text/html;charset=UTF-8"%>
 <%@page pageEncoding="UTF-8"%>
+<%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE HTML>
@@ -18,31 +19,12 @@
 <div id="main">
 <%@include file="nav.jsp" %>
 <div id="content">
-<div class="title">${goods.name}</div>
-<div class="content">
-<div id="goods_pic"><img src="<c:url value="${goods.picUrl}" />" height="130" width="130"/></div>
-<div>
-<p>
-类别：${category}<br/>
-价格：${goods.price}元<br/>
-数量：${inventory.availableNumber}个
-</p>
-<p><input type="button" value="进货" onclick="addInventory()"/>
-<input type="text" id="number"/>个
-</p>
-<p><input type="button" value="上架" onclick="location.href='<c:url value="/myshop/putOnline/"/>${goods.id}'"/></p>
-</div>
-<div id="goods_description">${goods.description}</div>
-</div>
-
+<div class="title">${goods.name} 库存添加成功</div>
+<div class="content"><img src="<c:url value="${goods.picUrl}"/>"/></div>
+<a href="<c:url value="/myshop" />">回到店铺</a>
 </div>
 </div>
 <%@include file="../footer.jsp" %>
 </div>
-<script>
-function addInventory() {
-	location.href='<c:url value="/myshop/inventory/"/>${goods.id}/add/' + document.getElementById("number").value;
-}
-</script>
 </body>
 </html>

@@ -110,6 +110,7 @@ public class MyShopController {
 		
 		model.addAttribute("goods", goods);
 		model.addAttribute("category", categoryMap.getMap().get(goods.getCategoryId()));
+		model.addAttribute("inventory", inventoryService.findByGoodsId(goodsId));
 		
 		if (goods.isOnline()) {
 			return "myshop/online_goods";
@@ -191,6 +192,7 @@ public class MyShopController {
 	@LoginRequired
 	public String addInventory(@PathVariable Long goodsId, @PathVariable Integer number, Model model, HttpSession session) {
 		inventoryService.add(goodsId, number);
+		model.addAttribute("goods", goodsService.get(goodsId));
 		return "myshop/inventory_success";
 	}
 	

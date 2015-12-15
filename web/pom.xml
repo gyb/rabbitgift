@@ -9,7 +9,7 @@
 		<relativePath>../parent/</relativePath>
 	</parent>
 	<artifactId>ttt-web</artifactId>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>ttt :: web</name>
 
 	<dependencies>

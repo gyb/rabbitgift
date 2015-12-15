@@ -1,5 +1,6 @@
 package com.irelint.ttt.inventory;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,12 +8,15 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import javax.validation.constraints.Min;
 
+import org.springframework.util.Assert;
+
 @Entity
 public class Inventory {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 
+	@Column(unique=true)
 	private Long goodsId;
 	
 	@Min(0)
@@ -37,6 +41,16 @@ public class Inventory {
 		this.availableNumber -= number;
 		this.selledNumber += number;
 		return true;
+	}
+	
+	public void cancel(int number) {
+		Assert.isTrue(number <= selledNumber, "Cancel goods number cannot be larger than selled number!");
+		this.availableNumber += number;
+		this.selledNumber -= number;
+	}
+
+	public void add(Integer number) {
+		this.availableNumber += number;
 	}
 
 	public Long getId() {

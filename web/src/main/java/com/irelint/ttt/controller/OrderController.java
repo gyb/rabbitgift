@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.irelint.ttt.account.AccountService;
 import com.irelint.ttt.aop.LoginRequired;
 import com.irelint.ttt.goods.GoodsService;
-import com.irelint.ttt.goods.model.Rating;
 import com.irelint.ttt.order.Order;
 import com.irelint.ttt.order.OrderService;
+import com.irelint.ttt.order.Rating;
 import com.irelint.ttt.user.UserService;
 import com.irelint.ttt.user.model.User;
 
@@ -76,14 +76,8 @@ public class OrderController {
 	@RequestMapping(value="/pay/{orderId}", method=RequestMethod.POST)
 	@LoginRequired
 	public String pay(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.pay(orderId);
-		if (order == null) {
-			return "order/pay_fail";
-		}
-		
-		model.addAttribute("order", order);
-		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
-		return "order/pay_success";
+		orderService.pay(orderId);
+		return "order/pay_finished";
 	}
 	
 	@RequestMapping(value="/cancel/{orderId}", method=RequestMethod.GET)

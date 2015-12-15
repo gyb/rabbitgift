@@ -53,6 +53,47 @@ public class Order implements Serializable {
 		CREATED, CONFIRMED, PAYED, DELIVERED, RECEIVED, COMPLETED, CANCELED, REFUNDED
 	}
 	
+	public void create(Long goodsOwnerId, long goodsPrice) {
+		this.setSellerId(goodsOwnerId);
+		this.setMoney(goodsPrice * this.num);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+
+	public void confirm() {
+		this.setState(State.CONFIRMED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+	
+	public void pay() {
+		this.setState(State.PAYED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+	
+	public void cancel() {
+		this.setState(State.CANCELED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+
+	public void deliver() {
+		this.setState(State.DELIVERED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+
+	public void refund() {
+		this.setState(State.REFUNDED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+
+	public void receive() {
+		this.setState(State.RECEIVED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+
+	public void complete() {
+		this.setState(State.COMPLETED);
+		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
+	}
+	
 	public Long getId() {
 		return id;
 	}

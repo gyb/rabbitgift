@@ -13,14 +13,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.irelint.ttt.account.Account;
 import com.irelint.ttt.aop.OptimisticLockRetry;
+import com.irelint.ttt.event.OrderCanceledEvent;
 import com.irelint.ttt.event.OrderConfirmedEvent;
 import com.irelint.ttt.event.OrderCreatedEvent;
+import com.irelint.ttt.event.OrderPayedEvent;
+import com.irelint.ttt.event.OrderReceivedEvent;
+import com.irelint.ttt.event.ToPayOrderEvent;
+import com.irelint.ttt.event.ToRefundOrderEvent;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.goods.GoodsNotOnlineException;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.goods.model.Rating;
 
 @Service
 public class OrderService implements ApplicationEventPublisherAware {
@@ -30,6 +33,8 @@ public class OrderService implements ApplicationEventPublisherAware {
 	private OrderHistoryDao orderHistoryDao;
 	@Autowired 
 	private GoodsDao goodsDao;
+	@Autowired
+	private RatingDao ratingDao;
 	
 	private ApplicationEventPublisher publisher;
 
@@ -41,17 +46,9 @@ public class OrderService implements ApplicationEventPublisherAware {
 			throw new GoodsNotOnlineException();
 		}
 
-		order.setSellerId(goods.getOwnerId());
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		order.setMoney(goods.getPrice() * order.getNum());
+		order.create(goods.getOwnerId(), goods.getPrice());
 		orderDao.save(order);
-		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.CREATE);
-		orderHistoryDao.save(history);
+		orderHistoryDao.save(OrderHistory.newCreate(order));
 		
 		publisher.publishEvent(new OrderCreatedEvent(this, order.getId(), order.getGoodsId(), order.getNum()));
 		
@@ -62,14 +59,9 @@ public class OrderService implements ApplicationEventPublisherAware {
 	@EventListener
 	public void confirmed(OrderConfirmedEvent event) {
 		Order order = orderDao.findOne(event.getOrderId());
-		order.setState(Order.State.CONFIRMED);
+		order.confirm();
 		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(0L);
-		history.setType(OrderHistory.Type.CONFIRM);
-		orderHistoryDao.save(history);
+		orderHistoryDao.save(OrderHistory.newConfirm(order));
 	}
 	
 	@Transactional(readOnly=true)
@@ -82,26 +74,23 @@ public class OrderService implements ApplicationEventPublisherAware {
 		return orderDao.findOne(orderId);
 	}
 	
-	@Transactional
-	@OptimisticLockRetry
-	public Order pay(Long orderId) {
+	@Transactional(readOnly=true)
+	public void pay(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.CREATED) return null;
-
-		Account account = accountDao.findOne(order.getBuyer().getId());
-		if (!account.freeze(order.getMoney())) return null;
-		accountDao.save(account);
+		if (order.getState() != Order.State.CONFIRMED) {
+			return;
+		}
 		
-		order.setState(Order.State.PAYED);
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		orderDao.save(order);
+		publisher.publishEvent(new ToPayOrderEvent(this, orderId, order.getBuyerId(), order.getMoney()));
+	}
+	
+	@Transactional
+	@EventListener
+	public Order pay(OrderPayedEvent event) {
+		Order order = orderDao.findOne(event.getOrderId());
+		order.pay();
 		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.PAY);
-		orderHistoryDao.save(history);
+		orderHistoryDao.save(OrderHistory.newPay(order));
 		
 		return order;
 	}
@@ -112,33 +101,15 @@ public class OrderService implements ApplicationEventPublisherAware {
 	}
 	
 	@Transactional
-	@OptimisticLockRetry
 	public Order cancel(Long orderId) {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.CREATED) return null;
 
-		updateGoodsForCancelOrder(order);
-		
-		order.setState(Order.State.CANCELED);
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		orderDao.save(order);
-		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getSellerId());
-		history.setType(OrderHistory.Type.CANCEL);
-		orderHistoryDao.save(history);
+		order.cancel();
+		orderHistoryDao.save(OrderHistory.newCancel(order));
+		publisher.publishEvent(new OrderCanceledEvent(this, order.getId(), order.getGoodsId(), order.getNum()));
 		
 		return order;
-	}
-
-	@CacheEvict(value="goods", key="#order.goods.id")
-	protected void updateGoodsForCancelOrder(Order order) {
-		Goods goods = goodsDao.findOne(order.getGoods().getId());
-		goods.setAvailableNumber(goods.getAvailableNumber() + order.getNum());
-		goods.setSelledNumber(goods.getSelledNumber() - order.getNum());
-		goodsDao.save(goods);
 	}
 
 	@Transactional
@@ -147,16 +118,9 @@ public class OrderService implements ApplicationEventPublisherAware {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.PAYED) return null;
 		
-		order.setState(Order.State.DELIVERED);
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		orderDao.save(order);
+		order.deliver();
 		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getSellerId());
-		history.setType(OrderHistory.Type.DELIVER);
-		orderHistoryDao.save(history);
+		orderHistoryDao.save(OrderHistory.newDeliver(order));
 		
 		return order;
 	}
@@ -165,23 +129,12 @@ public class OrderService implements ApplicationEventPublisherAware {
 	@OptimisticLockRetry
 	public Order refund(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.PAYED
-				&& order.getState() != Order.State.DELIVERED) return null;
-
-		Account account = accountDao.findOne(order.getBuyer().getId());
-		account.refund(order.getMoney());
-		accountDao.save(account);
+		if (order.getState() != Order.State.PAYED && order.getState() != Order.State.DELIVERED) return null;
 		
-		order.setState(Order.State.REFUNDED);
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		orderDao.save(order);
+		order.refund();
+		orderHistoryDao.save(OrderHistory.newRefund(order));
 		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getSellerId());
-		history.setType(OrderHistory.Type.REFUND);
-		orderHistoryDao.save(history);
+		publisher.publishEvent(new ToRefundOrderEvent(this, order.getId(), order.getBuyerId(), order.getMoney()));
 		
 		return order;
 	}
@@ -191,24 +144,11 @@ public class OrderService implements ApplicationEventPublisherAware {
 	public Order receive(Long orderId) {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.DELIVERED) return null;
+		
+		order.receive();
+		orderHistoryDao.save(OrderHistory.newReceive(order));
 
-		Account buyer = accountDao.findOne(order.getBuyer().getId());
-		buyer.confirmPay(order.getMoney());
-		accountDao.save(buyer);
-		Account seller = accountDao.findOne(order.getSeller().getId());
-		seller.receivePay(order.getMoney());
-		accountDao.save(seller);
-		
-		order.setState(Order.State.RECEIVED);
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		orderDao.save(order);
-		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.RECEIVE);
-		orderHistoryDao.save(history);
+		publisher.publishEvent(new OrderReceivedEvent(this, order.getId(), order.getBuyerId(), order.getSellerId(), order.getMoney()));
 		
 		return order;
 	}
@@ -230,16 +170,8 @@ public class OrderService implements ApplicationEventPublisherAware {
 		goods.addRating(rating.getNumber());
 		goodsDao.save(goods);
 		
-		order.setState(Order.State.COMPLETED);
-		order.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
-		orderDao.save(order);
-		
-		OrderHistory history = new OrderHistory();
-		history.setOrderId(order.getId());
-		history.setTime(order.getLastUpdateTime());
-		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.COMPLETE);
-		orderHistoryDao.save(history);
+		order.complete();
+		orderHistoryDao.save(OrderHistory.newComplete(order));
 		
 		return order;
 	}

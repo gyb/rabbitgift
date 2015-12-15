@@ -15,9 +15,9 @@ import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.goods.GoodsResult;
-import com.irelint.ttt.goods.RatingDao;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.goods.model.Rating;
+import com.irelint.ttt.order.Rating;
+import com.irelint.ttt.order.RatingDao;
 
 @Service
 public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisherAware {

@@ -27,6 +27,9 @@
 价格：${goods.price}元<br/>
 数量：${goods.availableNumber}个
 </p>
+<p><input type="button" value="进货" onclick="addInventory()"/>
+<input type="text" id="nubmer"/>个
+</p>
 <p><input type="button" value="上架" onclick="location.href='<c:url value="/myshop/putOnline/"/>${goods.id}'"/></p>
 </div>
 <div id="goods_description">${goods.description}</div>
@@ -36,5 +39,10 @@
 </div>
 <%@include file="../footer.jsp" %>
 </div>
+<script>
+function addInventory() {
+	location.href='<c:url value="/myshop/addInventory/"/>${goods.id}/number/' + document.getElementById("number").value;
+}
+</script>
 </body>
 </html>

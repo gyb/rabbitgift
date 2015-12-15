@@ -28,6 +28,9 @@
 剩余数量：${goods.availableNumber}个<br/>
 上架时间：<fmt:formatDate value="${goods.onlineTime}" type="both"/>
 </p>
+<p><input type="button" value="补货" onclick="addInventory()"/>
+<input type="text" id="nubmer"/>个
+</p>
 <p><input type="button" value="下架" onclick="location.href='<c:url value="/myshop/putOffline/"/>${goods.id}'"/></p>
 </div>
 <div id="goods_description">${goods.description}</div>
@@ -37,5 +40,10 @@
 </div>
 <%@include file="../footer.jsp" %>
 </div>
+<script>
+function addInventory() {
+	location.href='<c:url value="/myshop/addInventory/"/>${goods.id}/number/' + document.getElementById("number").value;
+}
+</script>
 </body>
 </html>

@@ -26,6 +26,7 @@ import com.irelint.ttt.goods.GoodsResult;
 import com.irelint.ttt.goods.GoodsService;
 import com.irelint.ttt.goods.model.CategoryMap;
 import com.irelint.ttt.goods.model.Goods;
+import com.irelint.ttt.inventory.InventoryService;
 import com.irelint.ttt.order.OrderService;
 import com.irelint.ttt.user.model.User;
 import com.irelint.ttt.util.ImagePathGen;
@@ -36,6 +37,7 @@ public class MyShopController {
 	private final static Logger logger = LoggerFactory.getLogger(MyShopController.class);
 	@Autowired GoodsService goodsService;
 	@Autowired OrderService orderService;
+	@Autowired InventoryService inventoryService;
 	@Autowired ImagePathGen imagePathGen;
 	@Autowired CategoryMap categoryMap;
 	private final static int PAGE_SIZE = 12;
@@ -183,6 +185,13 @@ public class MyShopController {
 			logger.error(e.getMessage());
 			return "myshop/copy_fail";
 		}
+	}
+	
+	@RequestMapping(value="/inventory/{goodsId}/add/{number}")
+	@LoginRequired
+	public String addInventory(@PathVariable Long goodsId, @PathVariable Integer number, Model model, HttpSession session) {
+		inventoryService.add(goodsId, number);
+		return "myshop/inventory_success";
 	}
 	
 	@RequestMapping(value="/orders", method=RequestMethod.GET) 

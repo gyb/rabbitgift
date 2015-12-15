@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.event.GoodsCreatedEvent;
+import com.irelint.ttt.event.OrderCanceledEvent;
 import com.irelint.ttt.event.OrderConfirmedEvent;
 import com.irelint.ttt.event.OrderCreatedEvent;
 
@@ -31,14 +32,32 @@ public class InventoryService implements ApplicationEventPublisherAware {
 	@EventListener
 	@OptimisticLockRetry
 	public void orderCreated(OrderCreatedEvent event) {
-		Inventory inventory = dao.findOne(event.getGoodsId());
+		Inventory inventory = dao.findByGoodsId(event.getGoodsId());
 		if (inventory.sell(event.getGoodsNumber())) {
 			publisher.publishEvent(new OrderConfirmedEvent(this, event.getOrderId()));
 		}
+	}
+	
+	@EventListener
+	@OptimisticLockRetry
+	public void orderCanceled(OrderCanceledEvent event) {
+		Inventory inventory = dao.findByGoodsId(event.getGoodsId());
+		inventory.cancel(event.getGoodsNumber());
+	}
+
+	@OptimisticLockRetry
+	public void add(Long goodsId, Integer number) {
+		Inventory inventory = dao.findByGoodsId(goodsId);
+		inventory.add(number);
 	}
 
 	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
 		this.publisher = publisher;
+	}
+
+	@Transactional(readOnly=true)
+	public Inventory findByGoodsId(Long goodsId) {
+		return dao.findByGoodsId(goodsId);
 	}
 }

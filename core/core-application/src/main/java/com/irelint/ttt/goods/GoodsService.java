@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.irelint.ttt.goods.GoodsResult;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.goods.model.Rating;
+import com.irelint.ttt.order.Rating;
 
 public interface GoodsService {
 

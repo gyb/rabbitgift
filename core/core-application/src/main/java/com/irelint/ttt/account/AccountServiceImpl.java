@@ -81,12 +81,14 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 	@EventListener
 	@OptimisticLockRetry
 	public void pay(ToPayOrderEvent event) {
+		logger.debug("receive ToPayOrderEvent");
 		Account account = dao.findOne(event.getOrderBuyerId());
 		if (!account.freeze(event.getOrderMoney())) {
 			return;
 		}
 		
 		publisher.publishEvent(new OrderPayedEvent(this, event.getOrderId()));
+		logger.debug("publish OrderPayedEvent");
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,6 +32,8 @@ import com.irelint.ttt.user.dao.UserDao;
 
 @Service
 public class OrderService implements ApplicationEventPublisherAware {
+	private final static Logger logger = LoggerFactory.getLogger(OrderService.class);
+	
 	@Autowired 
 	private OrderDao orderDao;
 	@Autowired 
@@ -96,6 +100,7 @@ public class OrderService implements ApplicationEventPublisherAware {
 		}
 		
 		publisher.publishEvent(new ToPayOrderEvent(this, orderId, order.getBuyerId(), order.getMoney()));
+		logger.debug("publish ToPayOrderEvent [{}, {}, {}]", orderId, order.getBuyerId(), order.getMoney());
 	}
 	
 	@Transactional
@@ -126,7 +131,7 @@ public class OrderService implements ApplicationEventPublisherAware {
 	@Transactional
 	public Order cancel(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.CREATED) return null;
+		if (order.getState() != Order.State.CREATED && order.getState() != Order.State.CONFIRMED) return null;
 
 		order.cancel();
 		orderHistoryDao.save(OrderHistory.newCancel(order));

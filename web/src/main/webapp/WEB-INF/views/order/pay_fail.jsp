@@ -17,11 +17,11 @@
   <input size="30" name="goods" value=""/> <input type="button" value="搜索商品"/>
 </div>
 <div id="main">
-<div class="title">订单支付完成</div>
+<div class="title">订单支付失败</div>
 <div class="content">
-由于我们采用了异步和事件驱动的架构，所以现在不知道你支付成功了没有。<br/>
-请检查一下订单状态，如果没有支付成功，请再次支付。<br/>
-<a href="<c:url value="/myttt/orders"/>">我的订单</a>
+订单已经支付过了，或者已经被关闭了。<br/>
+也有可能是您的账户余额不足<br/>
+请重新查看一下订单状态，并确认您的账户余额充足，谢谢。
 </div>
 </div>
 <%@include file="../footer.jsp" %>

@@ -26,7 +26,8 @@
 <c:forEach items="${page.content}" var="order">
 <tr>
 <td><a href="<c:url value="/order/history/${order.id}"/>">${order.id}</a></td>
-<td><c:choose><c:when test="${order.state=='CREATED'}">未支付</c:when>
+<td><c:choose><c:when test="${order.state=='CREATED'}">未确认</c:when>
+<c:when test="${order.state=='CONFIRMED'}">待支付</c:when>
 <c:when test="${order.state=='PAYED'}">已支付</c:when>
 <c:when test="${order.state=='DELIVERED'}">待确认</c:when>
 <c:when test="${order.state=='RECEIVED'}">已收货</c:when>
@@ -42,7 +43,7 @@
 <td>${order.money}元</td>
 <td>${order.address} ${order.receiverName} ${order.phone}</td>
 <td>
-<c:choose><c:when test="${order.state=='CREATED'}"><input type="button" value="关闭交易" onclick="location.href='<c:url value="/order/cancel/${order.id}"/>'"/></c:when>
+<c:choose><c:when test="${order['state']=='CREATED' || order['state']=='CONFIRMED'}"><input type="button" value="关闭交易" onclick="location.href='<c:url value="/order/cancel/${order.id}"/>'"/></c:when>
 <c:when test="${order.state=='PAYED'}"><input type="button" value="发货" onclick="location.href='<c:url value="/order/deliver/${order.id}"/>'"/> <input type="button" value="退款" onclick="location.href='<c:url value="/order/refund/${order.id}"/>'"/></c:when>
 <c:when test="${order.state=='DELIVERED'}"><input type="button" value="退款" onclick="location.href='<c:url value="/order/refund/${order.id}"/>'"/></c:when>
 </c:choose>

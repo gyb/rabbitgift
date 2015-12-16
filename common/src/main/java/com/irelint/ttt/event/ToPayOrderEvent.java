@@ -12,6 +12,7 @@ public class ToPayOrderEvent extends ApplicationEvent {
 
 	public ToPayOrderEvent(Object source, Long orderId, Long orderBuyerId, long orderMoney) {
 		super(source);
+		this.orderId = orderId;
 		this.orderBuyerId = orderBuyerId;
 		this.orderMoney = orderMoney;
 	}

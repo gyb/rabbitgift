@@ -62,7 +62,7 @@ public class OrderController {
 	@LoginRequired
 	public String showPay(@PathVariable Long orderId, Model model, HttpSession session) {
 		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.CREATED) {
+		if (order.getState() != Order.State.CONFIRMED) {
 			return "order/pay_fail";
 		}
 		

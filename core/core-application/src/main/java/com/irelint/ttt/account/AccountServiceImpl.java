@@ -78,6 +78,7 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 	}
 
 	@Override
+	@EventListener
 	@OptimisticLockRetry
 	public void pay(ToPayOrderEvent event) {
 		Account account = dao.findOne(event.getOrderBuyerId());
@@ -89,6 +90,7 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 	}
 
 	@Override
+	@EventListener
 	@OptimisticLockRetry
 	public void refund(ToRefundOrderEvent event) {
 		Account account = dao.findOne(event.getOrderBuyerId());
@@ -96,6 +98,7 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 	}
 
 	@Override
+	@EventListener
 	@OptimisticLockRetry
 	public void confirm(OrderReceivedEvent event) {
 		Account buyer = dao.findOne(event.getOrderBuyerId());

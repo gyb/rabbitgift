@@ -8,8 +8,6 @@ import com.irelint.ttt.user.model.User;
 
 public class OrderDto {
 	
-	private static final long serialVersionUID = 1L;
-	
 	public OrderDto(Order order) {
 		this.id = order.getId();
 		this.money = order.getMoney();

@@ -205,8 +205,10 @@ public class OrderService implements ApplicationEventPublisherAware {
 	}
 	
 	@Transactional(readOnly=true)
-	public List<OrderHistory> history(Long orderId) {
-		return orderHistoryDao.findByOrderId(orderId);
+	public List<OrderHistoryDto> history(Long orderId) {
+		return orderHistoryDao.findByOrderId(orderId).stream()
+				.map(oh -> new OrderHistoryDto(oh).setUser(userDao.findOne(oh.getUserId())))
+				.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly=true)

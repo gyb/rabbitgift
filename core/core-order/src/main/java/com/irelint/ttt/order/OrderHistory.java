@@ -137,4 +137,5 @@ public class OrderHistory implements Serializable {
 		history.setType(OrderHistory.Type.COMPLETE);
 		return history;
 	}
+	
 }

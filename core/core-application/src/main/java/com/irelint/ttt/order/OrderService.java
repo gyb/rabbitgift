@@ -92,7 +92,7 @@ public class OrderService implements ApplicationEventPublisherAware {
 		return orderDao.findOne(orderId);
 	}
 	
-	@Transactional(readOnly=true)
+	@Transactional
 	public void pay(Long orderId) {
 		Order order = orderDao.findOne(orderId);
 		if (order.getState() != Order.State.CONFIRMED) {

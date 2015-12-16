@@ -196,6 +196,7 @@ public class OrderController {
 		rating.setGoodsId(order.getGoodsId());
 		rating.setOrderId(orderId);
 		rating.setUserId(((User)session.getAttribute("user")).getId());
+		rating.setUsername(((User)session.getAttribute("user")).getLogin());
 		model.addAttribute(rating);
 
 		model.addAttribute("order", order);

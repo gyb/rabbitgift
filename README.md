@@ -12,4 +12,4 @@ cd web
 
 mvn tomcat7:run
 
-浏览器中访问 http://localhost:8080/ttt-web
+访问 http://localhost:8080/

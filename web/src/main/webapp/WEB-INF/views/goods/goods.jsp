@@ -19,7 +19,7 @@ var getRating = function(url, pageNo) {
 		$.each(data.content, function(k, v) {
 			var buydate = new Date(v.buyTime).toLocaleDateString();
 			var ratedate = new Date(v.ratingTime).toLocaleDateString();
-			var rating = "<tr>" + "<td><span class=\"stars stars-" + v.number + "\"></span></td><td>" + ratedate + "</td><td>" + v.user.login + "</td><td>" + v.comment + "</td><td>" + v.buyPrice + "元</td><td>" + buydate + "</td></tr>";
+			var rating = "<tr>" + "<td><span class=\"stars stars-" + v.number + "\"></span></td><td>" + ratedate + "</td><td>" + v.username + "</td><td>" + v.comment + "</td><td>" + v.buyPrice + "元</td><td>" + buydate + "</td></tr>";
 			$("#rating_list").append(rating);
 		});
 		$("#page").empty();

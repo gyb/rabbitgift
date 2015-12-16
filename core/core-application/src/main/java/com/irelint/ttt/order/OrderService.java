@@ -105,13 +105,12 @@ public class OrderService implements ApplicationEventPublisherAware {
 	
 	@Transactional
 	@EventListener
-	public Order pay(OrderPayedEvent event) {
+	public void pay(OrderPayedEvent event) {
 		Order order = orderDao.findOne(event.getOrderId());
 		order.pay();
-		
 		orderHistoryDao.save(OrderHistory.newPay(order));
 		
-		return order;
+		logger.debug("order {} payed successfully", order.getId());
 	}
 
 	@Transactional(readOnly=true)
@@ -131,6 +130,7 @@ public class OrderService implements ApplicationEventPublisherAware {
 	@Transactional
 	public Order cancel(Long orderId) {
 		Order order = orderDao.findOne(orderId);
+		logger.debug("cancel order {}, status is {}", order.getId(), order.getState());
 		if (order.getState() != Order.State.CREATED && order.getState() != Order.State.CONFIRMED) return null;
 
 		order.cancel();

@@ -24,7 +24,7 @@ public class Goods implements Serializable {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@NotNull 
+	@NotNull
 	private Long ownerId;
 	
 	private int categoryId;
@@ -181,8 +181,8 @@ public class Goods implements Serializable {
 		return ownerId;
 	}
 
-	public void setOwnerId(Long userId) {
-		this.ownerId = userId;
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public String getPicUrl() {

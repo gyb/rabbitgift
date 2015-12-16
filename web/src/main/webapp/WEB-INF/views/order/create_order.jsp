@@ -50,8 +50,8 @@ $(function() {
 </fieldset>
 <br/>
 <form:form modelAttribute="order" method="post">
-<form:hidden path="buyer.id"/>
-<form:hidden path="goods.id"/>
+<form:hidden path="buyerId"/>
+<form:hidden path="goodsId"/>
 <form:hidden path="receiverName"/>
 <form:hidden path="address"/>
 <form:hidden path="phone"/>

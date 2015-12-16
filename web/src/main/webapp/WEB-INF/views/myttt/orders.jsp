@@ -26,7 +26,8 @@
 <c:forEach items="${page.content}" var="order">
 <tr>
 <td><a href="<c:url value="/order/history/${order.id}"/>">${order.id}</a></td>
-<td><c:choose><c:when test="${order.state=='CREATED'}">未支付</c:when>
+<td><c:choose><c:when test="${order.state=='CREATED'}">待确认</c:when>
+<c:when test="${order.state=='CONFIRMED'}">待支付</c:when>
 <c:when test="${order.state=='PAYED'}">待发货</c:when>
 <c:when test="${order.state=='DELIVERED'}">已发货</c:when>
 <c:when test="${order.state=='RECEIVED'}">已收货</c:when>
@@ -42,7 +43,7 @@
 <td>${order.money}元</td>
 <td>${order.address} ${order.receiverName} ${order.phone}</td>
 <td>
-<c:choose><c:when test="${order.state=='CREATED'}"><input type="button" value="支付" onclick="location.href='<c:url value="/order/pay/${order.id}"/>'"/></c:when>
+<c:choose><c:when test="${order.state=='CONFIRMED'}"><input type="button" value="支付" onclick="location.href='<c:url value="/order/pay/${order.id}"/>'"/></c:when>
 <c:when test="${order.state=='DELIVERED'}"><input type="button" value="确认收货" onclick="location.href='<c:url value="/order/receive/${order.id}"/>'"/></c:when>
 <c:when test="${order.state=='RECEIVED'}"><input type="button" value="评价" onclick="location.href='<c:url value="/order/rate/${order.id}"/>'"/></c:when>
 </c:choose>

@@ -2,6 +2,7 @@ package com.irelint.ttt.order;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -9,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import com.irelint.ttt.event.ToRefundOrderEvent;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.goods.GoodsNotOnlineException;
 import com.irelint.ttt.goods.model.Goods;
+import com.irelint.ttt.user.dao.UserDao;
 
 @Service
 public class OrderService implements ApplicationEventPublisherAware {
@@ -35,6 +38,8 @@ public class OrderService implements ApplicationEventPublisherAware {
 	private GoodsDao goodsDao;
 	@Autowired
 	private RatingDao ratingDao;
+	@Autowired
+	private UserDao userDao;
 	
 	private ApplicationEventPublisher publisher;
 
@@ -65,8 +70,17 @@ public class OrderService implements ApplicationEventPublisherAware {
 	}
 	
 	@Transactional(readOnly=true)
-	public Page<Order> findBuyerOrders(final Long userId, Pageable pageable) {
-		return orderDao.findByBuyerId(userId, pageable); 
+	public Page<OrderDto> findBuyerOrders(final Long userId, Pageable pageable) {
+		Page<Order> page = orderDao.findByBuyerId(userId, pageable);
+		List<OrderDto> dtos = page.getContent().stream()
+				.map(o -> {
+					OrderDto dto = new OrderDto(o);
+					dto.setSeller(userDao.findOne(o.getSellerId()));
+					dto.setGoods(goodsDao.findOne(o.getGoodsId()));
+					return dto;
+				})
+				.collect(Collectors.toList());
+		return new PageImpl<OrderDto>(dtos, pageable, page.getTotalElements());
 	}
 	
 	@Transactional(readOnly=true)
@@ -96,8 +110,17 @@ public class OrderService implements ApplicationEventPublisherAware {
 	}
 
 	@Transactional(readOnly=true)
-	public Page<Order> findSellerOrders(final Long userId, Pageable pageable) {
-		return orderDao.findBySellerId(userId, pageable); 
+	public Page<OrderDto> findSellerOrders(final Long userId, Pageable pageable) {
+		Page<Order> page = orderDao.findBySellerId(userId, pageable);
+		List<OrderDto> dtos = page.getContent().stream()
+				.map(o -> {
+					OrderDto dto = new OrderDto(o);
+					dto.setBuyer(userDao.findOne(o.getBuyerId()));
+					dto.setGoods(goodsDao.findOne(o.getGoodsId()));
+					return dto;
+				})
+				.collect(Collectors.toList());
+		return new PageImpl<OrderDto>(dtos, pageable, page.getTotalElements());
 	}
 	
 	@Transactional
@@ -182,8 +205,13 @@ public class OrderService implements ApplicationEventPublisherAware {
 	}
 
 	@Transactional(readOnly=true)
-	public Order findDetail(Long orderId) {
-		return orderDao.findOne(orderId);
+	public OrderDto findDetail(Long orderId) {
+		Order order = orderDao.findOne(orderId);
+		OrderDto dto = new OrderDto(order);
+		dto.setBuyer(userDao.findOne(order.getBuyerId()));
+		dto.setSeller(userDao.findOne(order.getSellerId()));
+		dto.setGoods(goodsDao.findOne(order.getGoodsId()));
+		return dto;
 	}
 
 	@Override

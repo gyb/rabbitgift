@@ -25,7 +25,7 @@
 <p>
 类别：${category}<br/>
 价格：${goods.price}元<br/>
-剩余数量：${goods.availableNumber}个<br/>
+剩余数量：${inventory.availableNumber}个<br/>
 上架时间：<fmt:formatDate value="${goods.onlineTime}" type="both"/><br/>
 下架时间：<fmt:formatDate value="${goods.offlineTime}" type="both"/><br/>
 </p>

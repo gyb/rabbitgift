@@ -16,15 +16,11 @@ import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.goods.GoodsResult;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.order.Rating;
-import com.irelint.ttt.order.RatingDao;
 
 @Service
 public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisherAware {
 	@Autowired 
 	private GoodsDao dao;
-	@Autowired 
-	private RatingDao ratingDao;
 	
 	private ApplicationEventPublisher publisher;
 	
@@ -131,15 +127,6 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	@Transactional(readOnly=true)
 	public Page<Goods> findHomePage(Pageable pageable) {
 		return dao.findByState(Goods.State.ONLINE, pageable);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.irelint.ttt.goods.service.GoodsServic#findRatings(java.lang.Long, org.springframework.data.domain.Pageable)
-	 */
-	@Override
-	@Transactional(readOnly=true)
-	public Page<Rating> findRatings(final Long goodsId, Pageable pageable) {
-		return ratingDao.findByGoodsId(goodsId, pageable);
 	}
 
 	@Override

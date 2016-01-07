@@ -15,7 +15,27 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.irelint.ttt</groupId>
-			<artifactId>ttt-core-application</artifactId>
+			<artifactId>ttt-core-user</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-account</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-product</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-inventory</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.irelint.ttt</groupId>
+			<artifactId>ttt-core-order</artifactId>
 			<version>${version}</version>
 		</dependency>
 		<dependency>

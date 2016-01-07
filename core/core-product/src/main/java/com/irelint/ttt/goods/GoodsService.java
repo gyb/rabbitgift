@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 
 import com.irelint.ttt.goods.GoodsResult;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.order.Rating;
 
 public interface GoodsService {
 
@@ -26,7 +25,5 @@ public interface GoodsService {
 	GoodsResult copy(Long goodsId);
 
 	Page<Goods> findHomePage(Pageable pageable);
-
-	Page<Rating> findRatings(Long goodsId, Pageable pageable);
 
 }

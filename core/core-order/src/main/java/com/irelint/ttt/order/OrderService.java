@@ -25,10 +25,6 @@ import com.irelint.ttt.event.OrderPayedEvent;
 import com.irelint.ttt.event.OrderReceivedEvent;
 import com.irelint.ttt.event.ToPayOrderEvent;
 import com.irelint.ttt.event.ToRefundOrderEvent;
-import com.irelint.ttt.goods.GoodsDao;
-import com.irelint.ttt.goods.GoodsNotOnlineException;
-import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.user.dao.UserDao;
 
 @Service
 public class OrderService implements ApplicationEventPublisherAware {
@@ -38,12 +34,8 @@ public class OrderService implements ApplicationEventPublisherAware {
 	private OrderDao orderDao;
 	@Autowired 
 	private OrderHistoryDao orderHistoryDao;
-	@Autowired 
-	private GoodsDao goodsDao;
 	@Autowired
 	private RatingDao ratingDao;
-	@Autowired
-	private UserDao userDao;
 	
 	private ApplicationEventPublisher publisher;
 
@@ -219,6 +211,11 @@ public class OrderService implements ApplicationEventPublisherAware {
 		dto.setSeller(userDao.findOne(order.getSellerId()));
 		dto.setGoods(goodsDao.findOne(order.getGoodsId()));
 		return dto;
+	}
+
+	@Transactional(readOnly=true)
+	public Page<Rating> findRatings(final Long goodsId, Pageable pageable) {
+		return ratingDao.findByGoodsId(goodsId, pageable);
 	}
 
 	@Override

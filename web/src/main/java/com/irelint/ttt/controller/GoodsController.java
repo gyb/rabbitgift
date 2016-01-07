@@ -15,6 +15,7 @@ import com.irelint.ttt.goods.GoodsService;
 import com.irelint.ttt.goods.model.CategoryMap;
 import com.irelint.ttt.goods.model.Goods;
 import com.irelint.ttt.inventory.InventoryService;
+import com.irelint.ttt.order.OrderService;
 import com.irelint.ttt.order.Rating;
 import com.irelint.ttt.user.UserService;
 
@@ -25,6 +26,7 @@ public class GoodsController {
 	@Autowired GoodsService goodsService;
 	@Autowired UserService userService;
 	@Autowired InventoryService inventoryService;
+	@Autowired OrderService orderService;
 	@Autowired CategoryMap categoryMap;
 
 	@RequestMapping("{id}")
@@ -48,6 +50,6 @@ public class GoodsController {
 	@RequestMapping("/{id}/rating/page")
 	public @ResponseBody Page<Rating> findRatings(@PathVariable Long id, 
 			@PageableDefault(size=RATING_PAGE_SIZE) Pageable pageable, Model model) {
-		return goodsService.findRatings(id, pageable);
+		return orderService.findRatings(id, pageable);
 	}
 }

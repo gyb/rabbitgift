@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.GoodsRatedEvent;
+import com.irelint.ttt.event.GoodsUpdatedEvent;
 import com.irelint.ttt.event.State;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.goods.GoodsResult;
@@ -70,6 +71,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 			return GoodsResult.fail(goods);
 		}
 		
+		publisher.publishEvent(new GoodsUpdatedEvent(this, goodsId, goods.getPrice(), goods.getState()));
 		return GoodsResult.success(goods);
 	}
 
@@ -94,6 +96,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 			return GoodsResult.fail(goods);
 		}
 
+		publisher.publishEvent(new GoodsUpdatedEvent(this, goodsId, goods.getPrice(), goods.getState()));
 		return GoodsResult.success(goods);
 	}
 

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;
@@ -16,6 +18,8 @@ import com.irelint.ttt.order.OrderService;
 import com.irelint.ttt.order.Rating;
 import com.irelint.ttt.user.UserService;
 
+@Service
+@Transactional
 public class OrderApi {
 	@Autowired
 	private OrderService orderService;
@@ -24,6 +28,7 @@ public class OrderApi {
 	@Autowired
 	private GoodsService goodsService;
 
+	@Transactional(readOnly=true)
 	public Order get(Long orderId) {
 		return orderService.get(orderId);
 	}
@@ -32,6 +37,7 @@ public class OrderApi {
 		return orderService.create(order);
 	}
 
+	@Transactional(readOnly=true)
 	public Page<OrderDto> findSellerOrders(Long userId, Pageable pageable) {
 		Page<Order> page = orderService.findSellerOrders(userId, pageable);
 		List<OrderDto> dtos = page.getContent().stream()
@@ -45,6 +51,7 @@ public class OrderApi {
 		return new PageImpl<OrderDto>(dtos, pageable, page.getTotalElements());
 	}
 
+	@Transactional(readOnly=true)
 	public Page<OrderDto> findBuyerOrders(Long userId, Pageable pageable) {
 		Page<Order> page = orderService.findBuyerOrders(userId, pageable);
 		List<OrderDto> dtos = page.getContent().stream()
@@ -58,6 +65,7 @@ public class OrderApi {
 		return new PageImpl<OrderDto>(dtos, pageable, page.getTotalElements());
 	}
 	
+	@Transactional(readOnly=true)
 	public Page<Rating> findRatings(Long goodsId, Pageable pageable) {
 		return orderService.findRatings(goodsId, pageable);
 	}
@@ -86,6 +94,7 @@ public class OrderApi {
 		return orderService.rate(rating);
 	}
 
+	@Transactional(readOnly=true)
 	public OrderDto findDetail(Long orderId) {
 		Order order = orderService.get(orderId);
 		OrderDto dto = new OrderDto(order);
@@ -95,6 +104,7 @@ public class OrderApi {
 		return dto;
 	}
 
+	@Transactional(readOnly=true)
 	public List<OrderHistoryDto> history(Long orderId) {
 		return orderService.history(orderId).stream()
 				.map(oh -> new OrderHistoryDto(oh).setUser(userService.get(oh.getUserId())))

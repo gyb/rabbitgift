@@ -15,6 +15,7 @@ public class AccountApi {
 	@Autowired
 	private AccountService accountService;
 	
+	@Transactional(readOnly=true)
 	public Account get(Long userId) {
 		return accountService.get(userId);
 	}

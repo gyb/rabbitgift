@@ -1,8 +1,9 @@
-package com.irelint.ttt.order;
+package com.irelint.ttt.dto;
 
 import java.sql.Timestamp;
 
 import com.irelint.ttt.goods.model.Goods;
+import com.irelint.ttt.order.Order;
 import com.irelint.ttt.order.Order.State;
 import com.irelint.ttt.user.model.User;
 
@@ -30,6 +31,10 @@ public class OrderDto {
 	
 	private State state;
 	private Timestamp lastUpdateTime;
+
+	private User Buyer;
+	private User Seller;
+	private Goods goods;
 
 	public Long getId() {
 		return id;
@@ -79,10 +84,6 @@ public class OrderDto {
 	public void setLastUpdateTime(Timestamp lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
 	}
-
-	private User Buyer;
-	private User Seller;
-	private Goods goods;
 
 	public User getBuyer() {
 		return Buyer;

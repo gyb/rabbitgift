@@ -14,16 +14,16 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.irelint.ttt.api.UserApi;
 import com.irelint.ttt.user.DuplicateEmailException;
 import com.irelint.ttt.user.DuplicateLoginException;
-import com.irelint.ttt.user.UserService;
 import com.irelint.ttt.user.model.User;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
 	private final static Logger logger = LoggerFactory.getLogger(UserController.class);
-	@Autowired UserService service;
+	@Autowired UserApi service;
 	
 	@RequestMapping(value="register", method=RequestMethod.GET)
 	public String showRegister(Model model) {

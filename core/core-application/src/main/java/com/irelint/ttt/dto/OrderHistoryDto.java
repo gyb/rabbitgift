@@ -1,7 +1,8 @@
-package com.irelint.ttt.order;
+package com.irelint.ttt.dto;
 
 import java.sql.Timestamp;
 
+import com.irelint.ttt.order.OrderHistory;
 import com.irelint.ttt.order.OrderHistory.Type;
 import com.irelint.ttt.user.model.User;
 

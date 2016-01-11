@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.irelint.ttt.account.AccountResult;
-import com.irelint.ttt.account.AccountService;
 import com.irelint.ttt.aop.LoginRequired;
+import com.irelint.ttt.api.AccountApi;
 import com.irelint.ttt.user.model.User;
 
 @Controller
 @RequestMapping("/account")
 public class AccountController {
 	private final static Logger logger = LoggerFactory.getLogger(AccountController.class);
-	@Autowired AccountService accountService;
+	@Autowired AccountApi accountService;
 	
 	@RequestMapping(value="", method=RequestMethod.GET)
 	@LoginRequired

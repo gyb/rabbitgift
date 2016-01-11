@@ -11,23 +11,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.irelint.ttt.goods.GoodsService;
-import com.irelint.ttt.goods.model.CategoryMap;
+import com.irelint.ttt.api.GoodsApi;
+import com.irelint.ttt.api.InventoryApi;
+import com.irelint.ttt.api.OrderApi;
+import com.irelint.ttt.api.UserApi;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.inventory.InventoryService;
-import com.irelint.ttt.order.OrderService;
 import com.irelint.ttt.order.Rating;
-import com.irelint.ttt.user.UserService;
 
 @Controller
 @RequestMapping("/goods")
 public class GoodsController {
 	//private static final Logger logger = LoggerFactory.getLogger(GoodsController.class);
-	@Autowired GoodsService goodsService;
-	@Autowired UserService userService;
-	@Autowired InventoryService inventoryService;
-	@Autowired OrderService orderService;
-	@Autowired CategoryMap categoryMap;
+	@Autowired GoodsApi goodsService;
+	@Autowired UserApi userService;
+	@Autowired InventoryApi inventoryService;
+	@Autowired OrderApi orderService;
 
 	@RequestMapping("{id}")
 	public String findGoods(@PathVariable Long id, Model model) {
@@ -40,7 +38,7 @@ public class GoodsController {
 		
 		model.addAttribute("goods", goods);
 		model.addAttribute("inventory", inventoryService.findByGoodsId(id));
-		model.addAttribute("category", categoryMap.getMap().get(goods.getCategoryId()));
+		model.addAttribute("category", goodsService.getCategory(goods.getCategoryId()));
 		model.addAttribute("seller", userService.get(goods.getOwnerId()));
 		return "goods/goods";
 	}

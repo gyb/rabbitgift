@@ -15,6 +15,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.irelint.ttt.event.State;
+
 @Entity
 public class Goods implements Serializable {
 
@@ -71,7 +73,7 @@ public class Goods implements Serializable {
 		copy.setPrice(this.getPrice());
 		copy.setPicUrl(this.getPicUrl());
 		copy.setOwnerId(this.getOwnerId());
-		copy.setState(Goods.State.CREATED);
+		copy.setState(State.CREATED);
 		return copy;
 	}
 	
@@ -80,7 +82,7 @@ public class Goods implements Serializable {
 			return false;
 		}
 
-		this.setState(Goods.State.ONLINE);
+		this.setState(State.ONLINE);
 		this.setOnlineTime(new Timestamp(System.currentTimeMillis()));
 		return true;
 	}
@@ -90,7 +92,7 @@ public class Goods implements Serializable {
 			return false;
 		}
 
-		this.setState(Goods.State.OFFLINE);
+		this.setState(State.OFFLINE);
 		this.setOfflineTime(new Timestamp(System.currentTimeMillis()));
 		return true;
 	}
@@ -105,12 +107,6 @@ public class Goods implements Serializable {
 	
 	public boolean isOffline() {
 		return state == State.OFFLINE;
-	}
-
-	public enum State {
-		CREATED,
-		ONLINE,
-		OFFLINE
 	}
 
 	public Long getId() {

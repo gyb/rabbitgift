@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.event.GoodsCreatedEvent;
+import com.irelint.ttt.event.GoodsRatedEvent;
+import com.irelint.ttt.event.State;
 import com.irelint.ttt.goods.GoodsDao;
 import com.irelint.ttt.goods.GoodsResult;
 import com.irelint.ttt.goods.model.Goods;
@@ -31,7 +34,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	@Transactional
 	public void create(Goods goods) {
 		dao.save(goods);
-		publisher.publishEvent(new GoodsCreatedEvent(this, goods.getId()));
+		publisher.publishEvent(new GoodsCreatedEvent(this, goods.getId(), goods.getOwnerId(), goods.getPrice(), State.CREATED));
 	}
 
 	/* (non-Javadoc)
@@ -40,7 +43,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	@Override
 	@Transactional(readOnly=true)
 	public Page<Goods> findCreatedPage(final Long userId, Pageable pageable) {
-		return dao.findByOwnerIdAndState(userId, Goods.State.CREATED, pageable);
+		return dao.findByOwnerIdAndState(userId, State.CREATED, pageable);
 		//"/myshop/createdPage/"
 	}
 	
@@ -76,7 +79,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	@Override
 	@Transactional(readOnly=true)
 	public Page<Goods> findOnlinePage(final Long userId, Pageable pageable) {
-		return dao.findByOwnerIdAndState(userId, Goods.State.ONLINE, pageable);
+		return dao.findByOwnerIdAndState(userId, State.ONLINE, pageable);
 	}
 	
 	/* (non-Javadoc)
@@ -100,7 +103,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	@Override
 	@Transactional(readOnly=true)
 	public Page<Goods> findOfflinePage(final Long userId, Pageable pageable) {
-		return dao.findByOwnerIdAndState(userId, Goods.State.OFFLINE, pageable);
+		return dao.findByOwnerIdAndState(userId, State.OFFLINE, pageable);
 	}
 
 	/* (non-Javadoc)
@@ -116,7 +119,7 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 		
 		Goods copy = goods.createCopy();
 		dao.save(copy);
-		publisher.publishEvent(new GoodsCreatedEvent(this, copy.getId()));
+		publisher.publishEvent(new GoodsCreatedEvent(this, copy.getId(), copy.getOwnerId(), copy.getPrice(), State.CREATED));
 		return GoodsResult.success(copy);
 	}
 	
@@ -126,7 +129,15 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	@Override
 	@Transactional(readOnly=true)
 	public Page<Goods> findHomePage(Pageable pageable) {
-		return dao.findByState(Goods.State.ONLINE, pageable);
+		return dao.findByState(State.ONLINE, pageable);
+	}
+
+	@Override
+	@Transactional
+	@EventListener
+	public void addRating(GoodsRatedEvent event) {
+		Goods goods = dao.findOne(event.getGoodsId());
+		goods.addRating(event.getRatingNumber());
 	}
 
 	@Override

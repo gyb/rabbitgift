@@ -22,12 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.irelint.ttt.aop.LoginRequired;
+import com.irelint.ttt.api.GoodsApi;
+import com.irelint.ttt.api.InventoryApi;
+import com.irelint.ttt.api.OrderApi;
 import com.irelint.ttt.goods.GoodsResult;
-import com.irelint.ttt.goods.GoodsService;
-import com.irelint.ttt.goods.model.CategoryMap;
 import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.inventory.InventoryService;
-import com.irelint.ttt.order.OrderService;
 import com.irelint.ttt.user.model.User;
 import com.irelint.ttt.util.ImagePathGen;
 
@@ -35,11 +34,11 @@ import com.irelint.ttt.util.ImagePathGen;
 @RequestMapping("/myshop")
 public class MyShopController {
 	private final static Logger logger = LoggerFactory.getLogger(MyShopController.class);
-	@Autowired GoodsService goodsService;
-	@Autowired OrderService orderService;
-	@Autowired InventoryService inventoryService;
+	@Autowired GoodsApi goodsService;
+	@Autowired OrderApi orderService;
+	@Autowired InventoryApi inventoryService;
 	@Autowired ImagePathGen imagePathGen;
-	@Autowired CategoryMap categoryMap;
+
 	private final static int PAGE_SIZE = 12;
 	private final static int ORDER_PAGE_SIZE = 12;
 	
@@ -56,7 +55,7 @@ public class MyShopController {
 		Goods goods = new Goods();
 		goods.setOwnerId(user.getId());
 		model.addAttribute(goods);
-		model.addAttribute("category", categoryMap.getMap());
+		model.addAttribute("category", goodsService.getCategory());
 		return "myshop/upload";
 	}
 	
@@ -109,7 +108,7 @@ public class MyShopController {
 		}
 		
 		model.addAttribute("goods", goods);
-		model.addAttribute("category", categoryMap.getMap().get(goods.getCategoryId()));
+		model.addAttribute("category", goodsService.getCategory(goods.getCategoryId()));
 		model.addAttribute("inventory", inventoryService.findByGoodsId(goodsId));
 		
 		if (goods.isOnline()) {

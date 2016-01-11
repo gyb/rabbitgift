@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.irelint.ttt.aop.LoginRequired;
-import com.irelint.ttt.order.OrderService;
-import com.irelint.ttt.user.UserService;
+import com.irelint.ttt.api.OrderApi;
+import com.irelint.ttt.api.UserApi;
 import com.irelint.ttt.user.model.Address;
 import com.irelint.ttt.user.model.User;
 
@@ -26,8 +26,8 @@ import com.irelint.ttt.user.model.User;
 public class MytttController {
 	private final static Logger logger = LoggerFactory.getLogger(MytttController.class);
 
-	@Autowired UserService userService;
-	@Autowired OrderService orderService;
+	@Autowired UserApi userService;
+	@Autowired OrderApi orderService;
 	
 	private static final int ORDER_PAGE_SIZE = 10;
 	

@@ -3,7 +3,7 @@ package com.irelint.ttt.goods;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.irelint.ttt.goods.GoodsResult;
+import com.irelint.ttt.event.GoodsRatedEvent;
 import com.irelint.ttt.goods.model.Goods;
 
 public interface GoodsService {
@@ -26,4 +26,5 @@ public interface GoodsService {
 
 	Page<Goods> findHomePage(Pageable pageable);
 
+	void addRating(GoodsRatedEvent event);
 }

@@ -11,22 +11,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.irelint.ttt.account.AccountService;
 import com.irelint.ttt.aop.LoginRequired;
-import com.irelint.ttt.goods.GoodsService;
+import com.irelint.ttt.api.AccountApi;
+import com.irelint.ttt.api.GoodsApi;
+import com.irelint.ttt.api.OrderApi;
+import com.irelint.ttt.api.UserApi;
 import com.irelint.ttt.order.Order;
-import com.irelint.ttt.order.OrderService;
 import com.irelint.ttt.order.Rating;
-import com.irelint.ttt.user.UserService;
 import com.irelint.ttt.user.model.User;
 
 @Controller
 @RequestMapping("/order")
 public class OrderController {
-	@Autowired UserService userService;
-	@Autowired AccountService accountService;
-	@Autowired GoodsService goodsService;
-	@Autowired OrderService orderService;
+	@Autowired UserApi userService;
+	@Autowired AccountApi accountService;
+	@Autowired GoodsApi goodsService;
+	@Autowired OrderApi orderService;
 	
 	//FIXME validate orders belong to the user 
 

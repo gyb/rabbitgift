@@ -12,6 +12,8 @@ public class GoodsRatedEvent extends ApplicationEvent {
 
 	public GoodsRatedEvent(Object source, Long goodsId, int ratingNumber) {
 		super(source);
+		this.goodsId = goodsId;
+		this.ratingNumber = ratingNumber;
 	}
 	
 	public Long getGoodsId() {

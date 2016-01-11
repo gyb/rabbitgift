@@ -247,6 +247,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	
 	@Override
 	@Transactional
+	@EventListener
 	public void createGoods(GoodsCreatedEvent event) {
 		OrderGoods goods = new OrderGoods();
 		goods.setId(event.getGoodsId());
@@ -256,6 +257,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 
 	@Override
 	@Transactional
+	@EventListener
 	public void updateGoods(GoodsUpdatedEvent event) {
 		OrderGoods goods = orderGoodsDao.findOne(event.getGoodsId());
 		goods.setPrice(event.getPrice());

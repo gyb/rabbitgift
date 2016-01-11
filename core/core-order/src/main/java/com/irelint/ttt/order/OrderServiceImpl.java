@@ -252,6 +252,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 		OrderGoods goods = new OrderGoods();
 		goods.setId(event.getGoodsId());
 		goods.setOwnerId(event.getOwnerId());
+		goods.setPrice(event.getPrice());
+		goods.setState(event.getState());
 		orderGoodsDao.save(goods);
 	}
 

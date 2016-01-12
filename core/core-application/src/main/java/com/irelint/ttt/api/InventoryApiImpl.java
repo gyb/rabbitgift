@@ -8,7 +8,7 @@ import com.irelint.ttt.dto.InventoryDto;
 import com.irelint.ttt.service.InventoryService;
 
 @Service
-@DubboService
+@DubboService(interfaceClass=InventoryApi.class)
 public class InventoryApiImpl implements InventoryApi {
 	
 	@Autowired

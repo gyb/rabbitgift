@@ -18,7 +18,7 @@ import com.irelint.ttt.service.OrderService;
 import com.irelint.ttt.service.UserService;
 
 @Service
-@DubboService
+@DubboService(interfaceClass=OrderApi.class)
 public class OrderApiImpl implements OrderApi {
 	@Autowired
 	private OrderService orderService;

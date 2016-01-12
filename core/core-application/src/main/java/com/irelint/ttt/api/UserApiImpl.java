@@ -11,7 +11,7 @@ import com.irelint.ttt.dto.UserDto;
 import com.irelint.ttt.service.UserService;
 
 @Service
-@DubboService
+@DubboService(interfaceClass=UserApi.class)
 public class UserApiImpl implements UserApi {
 	@Autowired
 	private UserService userService;

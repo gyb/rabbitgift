@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.GoodsDto;
 import com.irelint.ttt.dto.GoodsResult;
 import com.irelint.ttt.service.GoodsService;
 
 @Service
-@Transactional
+@DubboService(interfaceClass=GoodsApi.class)
 public class GoodsApiImpl implements GoodsApi {
 
 	@Autowired
@@ -22,7 +22,6 @@ public class GoodsApiImpl implements GoodsApi {
 	private GoodsService goodsService;
 
 	@Override
-	@Transactional(readOnly = true)
 	public GoodsDto get(Long id) {
 		return goodsService.get(id);
 	}
@@ -43,25 +42,21 @@ public class GoodsApiImpl implements GoodsApi {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<GoodsDto> findHomePage(Pageable pageable) {
 		return goodsService.findHomePage(pageable);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<GoodsDto> findCreatedPage(Long userId, Pageable pageable) {
 		return goodsService.findCreatedPage(userId, pageable);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<GoodsDto> findOnlinePage(Long userId, Pageable pageable) {
 		return goodsService.findOnlinePage(userId, pageable);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<GoodsDto> findOfflinePage(Long userId, Pageable pageable) {
 		return goodsService.findOfflinePage(userId, pageable);
 	}

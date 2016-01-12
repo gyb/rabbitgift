@@ -9,6 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.dto.AccountDto;
 import com.irelint.ttt.dto.AccountResult;
@@ -21,6 +22,7 @@ import com.irelint.ttt.service.AccountService;
 
 @Service
 @Transactional
+@DubboService(interfaceClass = AccountService.class)
 public class AccountServiceImpl implements AccountService, ApplicationEventPublisherAware {
 	private final static Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 	

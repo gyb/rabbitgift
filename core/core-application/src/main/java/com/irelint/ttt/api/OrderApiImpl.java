@@ -8,8 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;
 import com.irelint.ttt.dto.RatingDto;
@@ -18,7 +18,7 @@ import com.irelint.ttt.service.OrderService;
 import com.irelint.ttt.service.UserService;
 
 @Service
-@Transactional
+@DubboService
 public class OrderApiImpl implements OrderApi {
 	@Autowired
 	private OrderService orderService;
@@ -31,7 +31,6 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#get(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public OrderDto get(Long orderId) {
 		return orderService.get(orderId);
 	}
@@ -48,7 +47,6 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findSellerOrders(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public Page<OrderDto> findSellerOrders(Long userId, Pageable pageable) {
 		Page<OrderDto> page = orderService.findSellerOrders(userId, pageable);
 		List<OrderDto> dtos = page.getContent().stream()
@@ -65,7 +63,6 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findBuyerOrders(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public Page<OrderDto> findBuyerOrders(Long userId, Pageable pageable) {
 		Page<OrderDto> page = orderService.findBuyerOrders(userId, pageable);
 		List<OrderDto> dtos = page.getContent().stream()
@@ -82,7 +79,6 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findRatings(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public Page<RatingDto> findRatings(Long goodsId, Pageable pageable) {
 		return orderService.findRatings(goodsId, pageable);
 	}
@@ -139,7 +135,6 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findDetail(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public OrderDto findDetail(Long orderId) {
 		OrderDto order = orderService.get(orderId);
 		order.setBuyer(userService.get(order.getBuyerId()));
@@ -152,7 +147,6 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#history(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public List<OrderHistoryDto> history(Long orderId) {
 		return orderService.history(orderId).stream()
 				.map(oh -> oh.setUser(userService.get(oh.getUserId())))

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.dto.HistoryType;
 import com.irelint.ttt.dto.OrderDto;
@@ -35,6 +36,7 @@ import com.irelint.ttt.event.ToRefundOrderEvent;
 import com.irelint.ttt.service.OrderService;
 
 @Service
+@DubboService(interfaceClass=OrderService.class)
 public class OrderServiceImpl implements OrderService, ApplicationEventPublisherAware {
 	private final static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 	
@@ -258,7 +260,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	@Transactional(readOnly=true)
 	public Page<RatingDto> findRatings(final Long goodsId, Pageable pageable) {
 		Page<Rating> page = ratingDao.findByGoodsId(goodsId, pageable);
-		return new PageImpl(page.getContent().stream().map(r -> r.toDto()).collect(Collectors.toList()),
+		return new PageImpl<RatingDto>(page.getContent().stream().map(r -> r.toDto()).collect(Collectors.toList()),
 				pageable, page.getTotalElements());
 	}
 	

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.dto.GoodsDto;
 import com.irelint.ttt.dto.GoodsResult;
@@ -24,6 +25,7 @@ import com.irelint.ttt.goods.model.Goods;
 import com.irelint.ttt.service.GoodsService;
 
 @Service
+@DubboService(interfaceClass=GoodsService.class)
 public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisherAware {
 	@Autowired 
 	private GoodsDao dao;

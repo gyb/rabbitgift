@@ -7,6 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.dto.InventoryDto;
 import com.irelint.ttt.event.GoodsCreatedEvent;
@@ -17,6 +18,7 @@ import com.irelint.ttt.service.InventoryService;
 
 @Service
 @Transactional
+@DubboService(interfaceClass=InventoryService.class)
 public class InventoryServiceImpl implements ApplicationEventPublisherAware, InventoryService {
 	
 	@Autowired

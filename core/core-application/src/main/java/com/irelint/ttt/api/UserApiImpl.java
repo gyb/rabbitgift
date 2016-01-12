@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.AddressDto;
 import com.irelint.ttt.dto.UserDto;
 import com.irelint.ttt.service.UserService;
 
 @Service
-@Transactional
+@DubboService
 public class UserApiImpl implements UserApi {
 	@Autowired
 	private UserService userService;
@@ -20,7 +20,6 @@ public class UserApiImpl implements UserApi {
 	 * @see com.irelint.ttt.api.UserApi#get(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public UserDto get(Long userId) {
 		return userService.get(userId);
 	}
@@ -45,7 +44,6 @@ public class UserApiImpl implements UserApi {
 	 * @see com.irelint.ttt.api.UserApi#findAddresses(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public List<AddressDto> findAddresses(Long userId) {
 		return userService.findAddresses(userId);
 	}

@@ -2,7 +2,6 @@ package com.irelint.ttt.user;
 
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.AddressDto;
 import com.irelint.ttt.dto.UserDto;
 import com.irelint.ttt.event.UserCreatedEvent;
@@ -24,6 +24,7 @@ import com.irelint.ttt.user.model.User;
 
 
 @Service
+@DubboService(interfaceClass = UserService.class)
 public class UserServiceImpl implements UserService, ApplicationEventPublisherAware {
 	@Autowired 
 	private UserDao userDao;

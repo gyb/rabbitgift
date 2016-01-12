@@ -2,13 +2,13 @@ package com.irelint.ttt.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.InventoryDto;
 import com.irelint.ttt.service.InventoryService;
 
 @Service
-@Transactional
+@DubboService
 public class InventoryApiImpl implements InventoryApi {
 	
 	@Autowired
@@ -18,7 +18,6 @@ public class InventoryApiImpl implements InventoryApi {
 	 * @see com.irelint.ttt.api.InventoryApi#findByGoodsId(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public InventoryDto findByGoodsId(Long goodsId) {
 		return inventoryService.findByGoodsId(goodsId);
 	}

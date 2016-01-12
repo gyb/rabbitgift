@@ -2,14 +2,14 @@ package com.irelint.ttt.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.AccountDto;
 import com.irelint.ttt.dto.AccountResult;
 import com.irelint.ttt.service.AccountService;
 
 @Service
-@Transactional
+@DubboService(interfaceClass=AccountApi.class)
 public class AccountApiImpl implements AccountApi {
 
 	@Autowired
@@ -19,7 +19,6 @@ public class AccountApiImpl implements AccountApi {
 	 * @see com.irelint.ttt.api.AccountApi#get(java.lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
 	public AccountDto get(Long userId) {
 		return accountService.get(userId);
 	}

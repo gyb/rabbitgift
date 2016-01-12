@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.irelint.ttt.aop.LoginRequired;
 import com.irelint.ttt.api.OrderApi;
 import com.irelint.ttt.api.UserApi;
-import com.irelint.ttt.user.model.Address;
-import com.irelint.ttt.user.model.User;
+import com.irelint.ttt.dto.AddressDto;
+import com.irelint.ttt.dto.UserDto;
 
 @Controller
 @RequestMapping("/myttt")
@@ -40,16 +40,16 @@ public class MytttController {
 	@RequestMapping(value="/address", method=RequestMethod.GET)
 	@LoginRequired
 	public String myAddress(Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
-		model.addAttribute("address", new Address());
+		UserDto user = (UserDto)session.getAttribute("user");
+		model.addAttribute("address", new AddressDto());
 		model.addAttribute("addressList", userService.findAddresses(user.getId()));
 		return "myttt/address";
 	}
 	
 	@RequestMapping(value="/address", method=RequestMethod.POST)
 	@LoginRequired
-	public String createAddress(@Valid Address address, BindingResult result, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+	public String createAddress(@Valid AddressDto address, BindingResult result, Model model, HttpSession session) {
+		UserDto user = (UserDto)session.getAttribute("user");
 		if (result.hasErrors()) {
 			model.addAttribute("addressList", userService.findAddresses(user.getId()));
 			return "myttt/address";
@@ -68,7 +68,7 @@ public class MytttController {
 	public String deleteAddress(@PathVariable Long addressId, Model model, HttpSession session) {
 		userService.deleteAddress(addressId);
 		if (logger.isDebugEnabled()) {
-			User user = (User)session.getAttribute("user");
+			UserDto user = (UserDto)session.getAttribute("user");
 			logger.debug("user " + user.getId() + " delete address " + addressId);
 		}
 		
@@ -78,7 +78,7 @@ public class MytttController {
 	@RequestMapping(value="/orders", method=RequestMethod.GET) 
 	@LoginRequired
 	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("page", orderService.findBuyerOrders(user.getId(), pageable));
 		return "myttt/orders";
 	}

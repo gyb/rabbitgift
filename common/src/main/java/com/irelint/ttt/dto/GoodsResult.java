@@ -1,11 +1,8 @@
-package com.irelint.ttt.goods;
-
-import com.irelint.ttt.goods.model.Goods;
-
+package com.irelint.ttt.dto;
 
 public class GoodsResult {
 	public boolean result;
-	public Goods goods;
+	public GoodsDto goods;
 	
 	public boolean success() {
 		return result;
@@ -15,13 +12,13 @@ public class GoodsResult {
 		return !result;
 	}
 	
-	public static GoodsResult fail(Goods goods) {
+	public static GoodsResult fail(GoodsDto goods) {
 		GoodsResult result = new GoodsResult();
 		result.goods = goods;
 		return result;
 	}
 	
-	public static GoodsResult success(Goods goods) {
+	public static GoodsResult success(GoodsDto goods) {
 		GoodsResult result = new GoodsResult();
 		result.goods = goods;
 		result.result = true;

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import com.irelint.ttt.event.State;
+import com.irelint.ttt.dto.State;
 
 @Entity
 public class OrderGoods implements Serializable {

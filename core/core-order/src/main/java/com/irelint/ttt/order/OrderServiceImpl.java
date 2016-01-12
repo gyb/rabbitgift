@@ -2,20 +2,26 @@ package com.irelint.ttt.order;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.aop.OptimisticLockRetry;
+import com.irelint.ttt.dto.HistoryType;
+import com.irelint.ttt.dto.OrderDto;
+import com.irelint.ttt.dto.OrderHistoryDto;
+import com.irelint.ttt.dto.OrderState;
+import com.irelint.ttt.dto.RatingDto;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.GoodsRatedEvent;
 import com.irelint.ttt.event.GoodsUpdatedEvent;
@@ -26,6 +32,7 @@ import com.irelint.ttt.event.OrderPayedEvent;
 import com.irelint.ttt.event.OrderReceivedEvent;
 import com.irelint.ttt.event.ToPayOrderEvent;
 import com.irelint.ttt.event.ToRefundOrderEvent;
+import com.irelint.ttt.service.OrderService;
 
 @Service
 public class OrderServiceImpl implements OrderService, ApplicationEventPublisherAware {
@@ -47,20 +54,21 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional
-	public Order create(Order order) {
+	public OrderDto create(OrderDto orderDto) {
 		//validate order
-		OrderGoods goods = orderGoodsDao.findOne(order.getGoodsId());
+		OrderGoods goods = orderGoodsDao.findOne(orderDto.getGoodsId());
 		if (!goods.isOnline()) {
 			throw new GoodsNotOnlineException();
 		}
 
+		Order order = Order.fromDto(orderDto);
 		order.create(goods.getOwnerId(), goods.getPrice());
 		orderDao.save(order);
 		orderHistoryDao.save(OrderHistory.newCreate(order));
 		
 		publisher.publishEvent(new OrderCreatedEvent(this, order.getId(), order.getGoodsId(), order.getNum()));
 		
-		return order;
+		return order.toDto();
 	}
 	
 	/* (non-Javadoc)
@@ -81,8 +89,11 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<Order> findBuyerOrders(final Long userId, Pageable pageable) {
-		return orderDao.findByBuyerId(userId, pageable);
+	public Page<OrderDto> findBuyerOrders(final Long userId, Pageable pageable) {
+		Page<Order> page = orderDao.findByBuyerId(userId, pageable);
+		return new PageImpl<OrderDto>(
+				page.getContent().stream().map(o -> o.toDto()).collect(Collectors.toList()),
+				pageable, page.getTotalElements());
 	}
 	
 	/* (non-Javadoc)
@@ -90,8 +101,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Order get(Long orderId) {
-		return orderDao.findOne(orderId);
+	public OrderDto get(Long orderId) {
+		return orderDao.findOne(orderId).toDto();
 	}
 	
 	/* (non-Javadoc)
@@ -101,7 +112,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	@Transactional
 	public void pay(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.CONFIRMED) {
+		if (order.getState() != OrderState.CONFIRMED) {
 			return;
 		}
 		
@@ -128,8 +139,11 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<Order> findSellerOrders(final Long userId, Pageable pageable) {
-		return orderDao.findBySellerId(userId, pageable);
+	public Page<OrderDto> findSellerOrders(final Long userId, Pageable pageable) {
+		Page<Order> page = orderDao.findBySellerId(userId, pageable);
+		return new PageImpl<OrderDto>(
+				page.getContent().stream().map(o -> o.toDto()).collect(Collectors.toList()),
+				pageable, page.getTotalElements());
 	}
 	
 	/* (non-Javadoc)
@@ -137,16 +151,16 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional
-	public Order cancel(Long orderId) {
+	public OrderDto cancel(Long orderId) {
 		Order order = orderDao.findOne(orderId);
 		logger.debug("cancel order {}, status is {}", order.getId(), order.getState());
-		if (order.getState() != Order.State.CREATED && order.getState() != Order.State.CONFIRMED) return null;
+		if (order.getState() != OrderState.CREATED && order.getState() != OrderState.CONFIRMED) return null;
 
 		order.cancel();
 		orderHistoryDao.save(OrderHistory.newCancel(order));
 		publisher.publishEvent(new OrderCanceledEvent(this, order.getId(), order.getGoodsId(), order.getNum()));
 		
-		return order;
+		return order.toDto();
 	}
 
 	/* (non-Javadoc)
@@ -155,15 +169,15 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	@Override
 	@Transactional
 	@OptimisticLockRetry
-	public Order deliver(Long orderId) {
+	public OrderDto deliver(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.PAYED) return null;
+		if (order.getState() != OrderState.PAYED) return null;
 		
 		order.deliver();
 		
 		orderHistoryDao.save(OrderHistory.newDeliver(order));
 		
-		return order;
+		return order.toDto();
 	}
 
 	/* (non-Javadoc)
@@ -172,16 +186,16 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	@Override
 	@Transactional
 	@OptimisticLockRetry
-	public Order refund(Long orderId) {
+	public OrderDto refund(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.PAYED && order.getState() != Order.State.DELIVERED) return null;
+		if (order.getState() != OrderState.PAYED && order.getState() != OrderState.DELIVERED) return null;
 		
 		order.refund();
 		orderHistoryDao.save(OrderHistory.newRefund(order));
 		
 		publisher.publishEvent(new ToRefundOrderEvent(this, order.getId(), order.getBuyerId(), order.getMoney()));
 		
-		return order;
+		return order.toDto();
 	}
 
 	/* (non-Javadoc)
@@ -190,16 +204,16 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	@Override
 	@Transactional
 	@OptimisticLockRetry
-	public Order receive(Long orderId) {
+	public OrderDto receive(Long orderId) {
 		Order order = orderDao.findOne(orderId);
-		if (order.getState() != Order.State.DELIVERED) return null;
+		if (order.getState() != OrderState.DELIVERED) return null;
 		
 		order.receive();
 		orderHistoryDao.save(OrderHistory.newReceive(order));
 
 		publisher.publishEvent(new OrderReceivedEvent(this, order.getId(), order.getBuyerId(), order.getSellerId(), order.getMoney()));
 		
-		return order;
+		return order.toDto();
 	}
 	
 	/* (non-Javadoc)
@@ -208,14 +222,14 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	@Override
 	@Transactional
 	@OptimisticLockRetry
-	@CacheEvict(value="goods", key="#rating.goodsId")
-	public Order rate(Rating rating) {
-		Order order = orderDao.findOne(rating.getOrderId());
-		if (order.getState() != Order.State.RECEIVED) return null;
+	public OrderDto rate(RatingDto ratingDto) {
+		Order order = orderDao.findOne(ratingDto.getOrderId());
+		if (order.getState() != OrderState.RECEIVED) return null;
 		
+		Rating rating = Rating.fromDto(ratingDto);
 		rating.setRatingTime(new Timestamp(System.currentTimeMillis()));
 		rating.setBuyPrice(order.getMoney() / order.getNum());
-		OrderHistory created = orderHistoryDao.findByOrderIdAndType(order.getId(), OrderHistory.Type.CREATE);
+		OrderHistory created = orderHistoryDao.findByOrderIdAndType(order.getId(), HistoryType.CREATE);
 		rating.setBuyTime(created.getTime());
 		ratingDao.save(rating);
 		
@@ -224,7 +238,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 		order.complete();
 		orderHistoryDao.save(OrderHistory.newComplete(order));
 		
-		return order;
+		return order.toDto();
 	}
 	
 	/* (non-Javadoc)
@@ -232,8 +246,9 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public List<OrderHistory> history(Long orderId) {
-		return orderHistoryDao.findByOrderId(orderId);
+	public List<OrderHistoryDto> history(Long orderId) {
+		return orderHistoryDao.findByOrderId(orderId).stream()
+				.map(oh -> oh.toDto()).collect(Collectors.toList());
 	}
 
 	/* (non-Javadoc)
@@ -241,8 +256,10 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<Rating> findRatings(final Long goodsId, Pageable pageable) {
-		return ratingDao.findByGoodsId(goodsId, pageable);
+	public Page<RatingDto> findRatings(final Long goodsId, Pageable pageable) {
+		Page<Rating> page = ratingDao.findByGoodsId(goodsId, pageable);
+		return new PageImpl(page.getContent().stream().map(r -> r.toDto()).collect(Collectors.toList()),
+				pageable, page.getTotalElements());
 	}
 	
 	@Override

@@ -6,6 +6,8 @@ import javax.persistence.Version;
 
 import org.springframework.util.Assert;
 
+import com.irelint.ttt.dto.AccountDto;
+
 @Entity
 public class Account {
 	@Id
@@ -20,6 +22,14 @@ public class Account {
 	
 	public Account(Long userId) {
 		this.userId = userId;
+	}
+	
+	public AccountDto toDto() {
+		AccountDto dto = new AccountDto();
+		dto.setUserId(userId);
+		dto.setTotalBalance(totalBalance);
+		dto.setAvailableBalance(availableBalance);
+		return dto;
 	}
 	
 	public void deposit(long money) {

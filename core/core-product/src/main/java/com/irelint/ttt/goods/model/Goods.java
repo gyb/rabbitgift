@@ -15,7 +15,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import com.irelint.ttt.event.State;
+import com.irelint.ttt.dto.GoodsDto;
+import com.irelint.ttt.dto.State;
 
 @Entity
 public class Goods implements Serializable {
@@ -63,6 +64,42 @@ public class Goods implements Serializable {
 	
 	public Goods(Long id) {
 		this.id = id;
+	}
+
+	public GoodsDto toDto() {
+		GoodsDto dto = new GoodsDto();
+		dto.setId(this.id);
+		dto.setOwnerId(this.ownerId);
+		dto.setCategoryId(this.categoryId);
+		dto.setName(this.name);
+		dto.setDescription(this.description);
+		dto.setOnlineTime(this.onlineTime);
+		dto.setOfflineTime(this.offlineTime);
+		dto.setPicUrl(this.picUrl);
+		dto.setPrice(this.price);
+		dto.setState(this.state);
+		
+		dto.setRatingNumber(ratingNumber);
+		dto.setRatingStars1(ratingStars1);
+		dto.setRatingStars2(ratingStars2);
+		dto.setRatingStars3(ratingStars3);
+		dto.setRatingStars4(ratingStars4);
+		dto.setRatingStars5(ratingStars5);
+		dto.setRatingTimes(ratingTimes);
+		dto.setAverageRating(averageRating);
+		return dto;
+	}
+
+	public static Goods fromDto(GoodsDto dto) {
+		Goods goods = new Goods();
+		goods.setOwnerId(dto.getOwnerId());
+		goods.setCategoryId(dto.getCategoryId());
+		goods.setPrice(dto.getPrice());
+		goods.setName(dto.getName());
+		goods.setDescription(dto.getDescription());
+		goods.setPicUrl(dto.getPicUrl());
+		goods.setState(dto.getState());
+		return goods;
 	}
 	
 	public Goods createCopy() {

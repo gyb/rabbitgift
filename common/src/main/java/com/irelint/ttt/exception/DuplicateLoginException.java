@@ -1,4 +1,4 @@
-package com.irelint.ttt.user;
+package com.irelint.ttt.exception;
 
 public class DuplicateLoginException extends RuntimeException {
 

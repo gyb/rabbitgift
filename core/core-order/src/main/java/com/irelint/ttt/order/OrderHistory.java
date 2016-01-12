@@ -8,6 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.irelint.ttt.dto.HistoryType;
+import com.irelint.ttt.dto.OrderHistoryDto;
+
 @Entity
 public class OrderHistory implements Serializable {
 
@@ -17,13 +20,17 @@ public class OrderHistory implements Serializable {
 	private Long id;
 	
 	private Long orderId;
-	private Type type;
+	private HistoryType type;
 	private Timestamp time;
 	
 	private Long userId;
 	
-	public enum Type {
-		CREATE, CONFIRM, PAY, DELIVER, RECEIVE, COMPLETE, CANCEL, REFUND
+	public OrderHistoryDto toDto() {
+		OrderHistoryDto dto = new OrderHistoryDto();
+		dto.setType(this.type);
+		dto.setTime(this.time);
+		dto.setUserId(this.userId);
+		return dto;
 	}
 	
 	public Long getId() {
@@ -42,11 +49,11 @@ public class OrderHistory implements Serializable {
 		this.orderId = orderId;
 	}
 
-	public Type getType() {
+	public HistoryType getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(HistoryType type) {
 		this.type = type;
 	}
 
@@ -71,7 +78,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.CREATE);
+		history.setType(HistoryType.CREATE);
 		return history;
 	}
 
@@ -80,7 +87,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(0L);
-		history.setType(OrderHistory.Type.CONFIRM);
+		history.setType(HistoryType.CONFIRM);
 		return history;
 	}
 
@@ -89,7 +96,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.PAY);
+		history.setType(HistoryType.PAY);
 		return history;
 	}
 
@@ -98,7 +105,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getSellerId());
-		history.setType(OrderHistory.Type.CANCEL);
+		history.setType(HistoryType.CANCEL);
 		return history;
 	}
 
@@ -107,7 +114,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getSellerId());
-		history.setType(OrderHistory.Type.DELIVER);
+		history.setType(HistoryType.DELIVER);
 		return history;
 	}
 
@@ -116,7 +123,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getSellerId());
-		history.setType(OrderHistory.Type.REFUND);
+		history.setType(HistoryType.REFUND);
 		return history;
 	}
 
@@ -125,7 +132,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.RECEIVE);
+		history.setType(HistoryType.RECEIVE);
 		return history;
 	}
 
@@ -134,7 +141,7 @@ public class OrderHistory implements Serializable {
 		history.setOrderId(order.getId());
 		history.setTime(order.getLastUpdateTime());
 		history.setUserId(order.getBuyerId());
-		history.setType(OrderHistory.Type.COMPLETE);
+		history.setType(HistoryType.COMPLETE);
 		return history;
 	}
 	

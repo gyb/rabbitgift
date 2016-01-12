@@ -8,10 +8,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.util.DigestUtils;
+
+import com.irelint.ttt.dto.UserDto;
 
 /**
  * @author yibing
@@ -43,12 +46,31 @@ public class User implements Serializable {
 	
 	@NotNull
 	@Size(min=6, max=30)
+	@Transient
 	private String password;
 	
 	public User() {}
 	
 	public User(Long id) {
 		this.id = id;
+	}
+	
+	public UserDto toDto() {
+		UserDto dto = new UserDto();
+		dto.setId(this.id);
+		dto.setCreateTime(this.createTime);
+		dto.setEmail(this.email);
+		dto.setLogin(this.login);
+		return dto;
+	}
+	
+	public static User fromDto(UserDto dto) {
+		User user = new User();
+		user.setLogin(dto.getLogin());
+		user.setEmail(dto.getEmail());
+		user.setCreateTime(dto.getCreateTime());
+		user.setPassword(dto.getPassword());
+		return user;
 	}
 	
 	public void setPassword(String password) {
@@ -101,4 +123,5 @@ public class User implements Serializable {
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
+	
 }

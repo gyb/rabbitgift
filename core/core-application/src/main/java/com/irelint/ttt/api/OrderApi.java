@@ -12,11 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;
-import com.irelint.ttt.goods.GoodsService;
-import com.irelint.ttt.order.Order;
-import com.irelint.ttt.order.OrderService;
-import com.irelint.ttt.order.Rating;
-import com.irelint.ttt.user.UserService;
+import com.irelint.ttt.dto.RatingDto;
+import com.irelint.ttt.service.GoodsService;
+import com.irelint.ttt.service.OrderService;
+import com.irelint.ttt.service.UserService;
 
 @Service
 @Transactional
@@ -29,22 +28,21 @@ public class OrderApi {
 	private GoodsService goodsService;
 
 	@Transactional(readOnly=true)
-	public Order get(Long orderId) {
+	public OrderDto get(Long orderId) {
 		return orderService.get(orderId);
 	}
 
-	public Order create(Order order) {
+	public OrderDto create(OrderDto order) {
 		return orderService.create(order);
 	}
 
 	@Transactional(readOnly=true)
 	public Page<OrderDto> findSellerOrders(Long userId, Pageable pageable) {
-		Page<Order> page = orderService.findSellerOrders(userId, pageable);
+		Page<OrderDto> page = orderService.findSellerOrders(userId, pageable);
 		List<OrderDto> dtos = page.getContent().stream()
-				.map(o -> {
-					OrderDto dto = new OrderDto(o);
-					dto.setBuyer(userService.get(o.getBuyerId()));
-					dto.setGoods(goodsService.get(o.getGoodsId()));
+				.map(dto -> {
+					dto.setBuyer(userService.get(dto.getBuyerId()));
+					dto.setGoods(goodsService.get(dto.getGoodsId()));
 					return dto;
 				})
 				.collect(Collectors.toList());
@@ -53,12 +51,11 @@ public class OrderApi {
 
 	@Transactional(readOnly=true)
 	public Page<OrderDto> findBuyerOrders(Long userId, Pageable pageable) {
-		Page<Order> page = orderService.findBuyerOrders(userId, pageable);
+		Page<OrderDto> page = orderService.findBuyerOrders(userId, pageable);
 		List<OrderDto> dtos = page.getContent().stream()
-				.map(o -> {
-					OrderDto dto = new OrderDto(o);
-					dto.setSeller(userService.get(o.getSellerId()));
-					dto.setGoods(goodsService.get(o.getGoodsId()));
+				.map(dto -> {
+					dto.setSeller(userService.get(dto.getSellerId()));
+					dto.setGoods(goodsService.get(dto.getGoodsId()));
 					return dto;
 				})
 				.collect(Collectors.toList());
@@ -66,7 +63,7 @@ public class OrderApi {
 	}
 	
 	@Transactional(readOnly=true)
-	public Page<Rating> findRatings(Long goodsId, Pageable pageable) {
+	public Page<RatingDto> findRatings(Long goodsId, Pageable pageable) {
 		return orderService.findRatings(goodsId, pageable);
 	}
 
@@ -74,40 +71,39 @@ public class OrderApi {
 		orderService.pay(orderId);
 	}
 
-	public Order cancel(Long orderId) {
+	public OrderDto cancel(Long orderId) {
 		return orderService.cancel(orderId);
 	}
 
-	public Order deliver(Long orderId) {
+	public OrderDto deliver(Long orderId) {
 		return orderService.deliver(orderId);
 	}
 
-	public Order refund(Long orderId) {
+	public OrderDto refund(Long orderId) {
 		return orderService.refund(orderId);
 	}
 
-	public Order receive(Long orderId) {
+	public OrderDto receive(Long orderId) {
 		return orderService.receive(orderId);
 	}
 
-	public Order rate(Rating rating) {
+	public OrderDto rate(RatingDto rating) {
 		return orderService.rate(rating);
 	}
 
 	@Transactional(readOnly=true)
 	public OrderDto findDetail(Long orderId) {
-		Order order = orderService.get(orderId);
-		OrderDto dto = new OrderDto(order);
-		dto.setBuyer(userService.get(order.getBuyerId()));
-		dto.setSeller(userService.get(order.getSellerId()));
-		dto.setGoods(goodsService.get(order.getGoodsId()));
-		return dto;
+		OrderDto order = orderService.get(orderId);
+		order.setBuyer(userService.get(order.getBuyerId()));
+		order.setSeller(userService.get(order.getSellerId()));
+		order.setGoods(goodsService.get(order.getGoodsId()));
+		return order;
 	}
 
 	@Transactional(readOnly=true)
 	public List<OrderHistoryDto> history(Long orderId) {
 		return orderService.history(orderId).stream()
-				.map(oh -> new OrderHistoryDto(oh).setUser(userService.get(oh.getUserId())))
+				.map(oh -> oh.setUser(userService.get(oh.getUserId())))
 				.collect(Collectors.toList());
 	}
 

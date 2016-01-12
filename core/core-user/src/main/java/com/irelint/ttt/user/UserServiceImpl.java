@@ -2,6 +2,8 @@ package com.irelint.ttt.user;
 
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -9,9 +11,12 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.irelint.ttt.dto.AddressDto;
+import com.irelint.ttt.dto.UserDto;
 import com.irelint.ttt.event.UserCreatedEvent;
-import com.irelint.ttt.user.DuplicateEmailException;
-import com.irelint.ttt.user.DuplicateLoginException;
+import com.irelint.ttt.exception.DuplicateEmailException;
+import com.irelint.ttt.exception.DuplicateLoginException;
+import com.irelint.ttt.service.UserService;
 import com.irelint.ttt.user.dao.AddressDao;
 import com.irelint.ttt.user.dao.UserDao;
 import com.irelint.ttt.user.model.Address;
@@ -32,17 +37,18 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 	 */
 	@Override
 	@Transactional
-	public User register(User user) {
-		User checkDuplicate = userDao.findByLogin(user.getLogin());
+	public UserDto register(UserDto dto) {
+		User checkDuplicate = userDao.findByLogin(dto.getLogin());
 		if (checkDuplicate != null) throw new DuplicateLoginException();
 		
-		checkDuplicate = userDao.findByEmail(user.getEmail());
+		checkDuplicate = userDao.findByEmail(dto.getEmail());
 		if (checkDuplicate != null) throw new DuplicateEmailException();
 		
+		User user = User.fromDto(dto);
 		userDao.save(user);
 		publisher.publishEvent(new UserCreatedEvent(this, user.getId()));
 
-		return user;
+		return user.toDto();
 	}
 	
 	/* (non-Javadoc)
@@ -50,10 +56,10 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public User login(String login, String password) {
+	public UserDto login(String login, String password) {
 		User user = userDao.findByLogin(login);
 		if (user != null && user.checkPassword(password)) {
-			return user;
+			return user.toDto();
 		}
 		return null;
 	}
@@ -63,8 +69,12 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 	 */
 	@Override
 	@Transactional(readOnly=true) 
-	public User get(Long id) {
-		return userDao.findOne(id);
+	public UserDto get(Long id) {
+		User user = userDao.findOne(id);
+		if (user != null) {
+			return user.toDto();
+		}
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -72,8 +82,8 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 	 */
 	@Override
 	@Transactional
-	public void saveAddress(Address address) {
-		addressDao.save(address);
+	public void saveAddress(AddressDto dto) {
+		addressDao.save(Address.fromDto(dto));
 	}
 	
 	/* (non-Javadoc)
@@ -81,8 +91,9 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public List<Address> findAddresses(Long userId) {
-		return addressDao.findByUserId(userId);
+	public List<AddressDto> findAddresses(Long userId) {
+		return addressDao.findByUserId(userId).stream()
+				.map(a -> a.toDto()).collect(Collectors.toList());
 	}
 	
 	/* (non-Javadoc)

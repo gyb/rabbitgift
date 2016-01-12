@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.irelint.ttt.event.State;
+import com.irelint.ttt.dto.State;
 import com.irelint.ttt.goods.model.Goods;
 
 public interface GoodsDao extends PagingAndSortingRepository<Goods, Long> {

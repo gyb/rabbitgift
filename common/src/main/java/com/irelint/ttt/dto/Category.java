@@ -1,4 +1,4 @@
-package com.irelint.ttt.goods.model;
+package com.irelint.ttt.dto;
 
 
 public class Category {

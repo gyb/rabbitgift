@@ -10,11 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.aop.OptimisticLockRetry;
+import com.irelint.ttt.dto.AccountDto;
+import com.irelint.ttt.dto.AccountResult;
 import com.irelint.ttt.event.OrderPayedEvent;
 import com.irelint.ttt.event.OrderReceivedEvent;
 import com.irelint.ttt.event.ToPayOrderEvent;
 import com.irelint.ttt.event.ToRefundOrderEvent;
 import com.irelint.ttt.event.UserCreatedEvent;
+import com.irelint.ttt.service.AccountService;
 
 @Service
 @Transactional
@@ -30,8 +33,8 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Account get(Long userId) {
-		return dao.findOne(userId);
+	public AccountDto get(Long userId) {
+		return dao.findOne(userId).toDto();
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +59,7 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 		}
 		
 		account.deposit(money);
-		return AccountResult.success(account);
+		return AccountResult.success(account.toDto());
 	}
 
 	/* (non-Javadoc)
@@ -72,9 +75,9 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 		}
 		
 		if (account.withdraw(money)) {;
-			return AccountResult.success(account);
+			return AccountResult.success(account.toDto());
 		}
-		return AccountResult.fail(account);
+		return AccountResult.fail(account.toDto());
 	}
 
 	@Override

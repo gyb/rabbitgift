@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.aop.OptimisticLockRetry;
+import com.irelint.ttt.dto.InventoryDto;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.OrderCanceledEvent;
 import com.irelint.ttt.event.OrderConfirmedEvent;
 import com.irelint.ttt.event.OrderCreatedEvent;
+import com.irelint.ttt.service.InventoryService;
 
 @Service
 @Transactional
@@ -72,8 +74,8 @@ public class InventoryServiceImpl implements ApplicationEventPublisherAware, Inv
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Inventory findByGoodsId(Long goodsId) {
-		return dao.findByGoodsId(goodsId);
+	public InventoryDto findByGoodsId(Long goodsId) {
+		return dao.findByGoodsId(goodsId).toDto();
 	}
 
 	@Override

@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.irelint.ttt.account.AccountResult;
 import com.irelint.ttt.aop.LoginRequired;
 import com.irelint.ttt.api.AccountApi;
-import com.irelint.ttt.user.model.User;
+import com.irelint.ttt.dto.AccountResult;
+import com.irelint.ttt.dto.UserDto;
 
 @Controller
 @RequestMapping("/account")
@@ -25,7 +25,7 @@ public class AccountController {
 	@RequestMapping(value="", method=RequestMethod.GET)
 	@LoginRequired
 	public String get(Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("account", accountService.get(user.getId()));
 		return "account/account";
 	}
@@ -33,7 +33,7 @@ public class AccountController {
 	@RequestMapping(value="/deposit/{money}")
 	@LoginRequired
 	public String deposit(@PathVariable long money, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		
 		try {
 			AccountResult result = accountService.deposit(user.getId(), money);
@@ -52,7 +52,7 @@ public class AccountController {
 	@RequestMapping(value="/withdraw/{money}")
 	@LoginRequired
 	public String withdraw(@PathVariable long money, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		
 		try {
 			AccountResult result = accountService.withdraw(user.getId(), money);

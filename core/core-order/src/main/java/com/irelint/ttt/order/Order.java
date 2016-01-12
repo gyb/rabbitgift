@@ -12,6 +12,9 @@ import javax.persistence.Version;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import com.irelint.ttt.dto.OrderDto;
+import com.irelint.ttt.dto.OrderState;
+
 @Entity
 @Table(name="orders")
 public class Order implements Serializable {
@@ -42,13 +45,40 @@ public class Order implements Serializable {
 	@NotNull
 	private String phone;
 	
-	private State state = State.CREATED;
+	private OrderState state = OrderState.CREATED;
 	private Timestamp lastUpdateTime;
 	@Version 
 	private int version;
 	
-	public enum State {
-		CREATED, CONFIRMED, PAYED, DELIVERED, RECEIVED, COMPLETED, CANCELED, REFUNDED
+	public OrderDto toDto() {
+		OrderDto dto = new OrderDto();
+		dto.setId(this.id);
+		dto.setMoney(this.money);
+		dto.setNum(this.num);
+		dto.setReceiverName(this.receiverName);
+		dto.setAddress(this.address);
+		dto.setPhone(this.phone);
+		dto.setState(this.state);
+		dto.setLastUpdateTime(this.lastUpdateTime);
+		dto.setBuyerId(this.buyerId);
+		dto.setSellerId(this.sellerId);
+		dto.setGoodsId(this.goodsId);
+		return dto;
+	}
+	
+	public static Order fromDto(OrderDto dto) {
+		Order order = new Order();
+		order.address = dto.getAddress();
+		order.buyerId = dto.getBuyerId();
+		order.goodsId = dto.getGoodsId();
+		order.lastUpdateTime = dto.getLastUpdateTime();
+		order.money = dto.getMoney();
+		order.num = dto.getNum();
+		order.phone = dto.getPhone();
+		order.receiverName = dto.getReceiverName();
+		order.sellerId = dto.getSellerId();
+		order.state = dto.getState();
+		return order;
 	}
 	
 	public void create(Long goodsOwnerId, long goodsPrice) {
@@ -58,37 +88,37 @@ public class Order implements Serializable {
 	}
 
 	public void confirm() {
-		this.setState(State.CONFIRMED);
+		this.setState(OrderState.CONFIRMED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 	
 	public void pay() {
-		this.setState(State.PAYED);
+		this.setState(OrderState.PAYED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 	
 	public void cancel() {
-		this.setState(State.CANCELED);
+		this.setState(OrderState.CANCELED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 
 	public void deliver() {
-		this.setState(State.DELIVERED);
+		this.setState(OrderState.DELIVERED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 
 	public void refund() {
-		this.setState(State.REFUNDED);
+		this.setState(OrderState.REFUNDED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 
 	public void receive() {
-		this.setState(State.RECEIVED);
+		this.setState(OrderState.RECEIVED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 
 	public void complete() {
-		this.setState(State.COMPLETED);
+		this.setState(OrderState.COMPLETED);
 		this.setLastUpdateTime(new Timestamp(System.currentTimeMillis()));
 	}
 	
@@ -134,10 +164,10 @@ public class Order implements Serializable {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public State getState() {
+	public OrderState getState() {
 		return state;
 	}
-	public void setState(State state) {
+	public void setState(OrderState state) {
 		this.state = state;
 	}
 	public void setLastUpdateTime(Timestamp lastUpdateTime) {

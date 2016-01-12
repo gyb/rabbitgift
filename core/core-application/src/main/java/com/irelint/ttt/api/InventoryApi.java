@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.irelint.ttt.inventory.Inventory;
-import com.irelint.ttt.inventory.InventoryService;
+import com.irelint.ttt.dto.InventoryDto;
+import com.irelint.ttt.service.InventoryService;
 
 @Service
 @Transactional
@@ -15,7 +15,7 @@ public class InventoryApi {
 	private InventoryService inventoryService;
 
 	@Transactional(readOnly=true)
-	public Inventory findByGoodsId(Long goodsId) {
+	public InventoryDto findByGoodsId(Long goodsId) {
 		return inventoryService.findByGoodsId(goodsId);
 	}
 

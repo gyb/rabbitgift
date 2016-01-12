@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.irelint.ttt.account.Account;
-import com.irelint.ttt.account.AccountResult;
-import com.irelint.ttt.account.AccountService;
+import com.irelint.ttt.dto.AccountDto;
+import com.irelint.ttt.dto.AccountResult;
+import com.irelint.ttt.service.AccountService;
 
 @Service
 @Transactional
@@ -16,7 +16,7 @@ public class AccountApi {
 	private AccountService accountService;
 	
 	@Transactional(readOnly=true)
-	public Account get(Long userId) {
+	public AccountDto get(Long userId) {
 		return accountService.get(userId);
 	}
 

@@ -10,6 +10,8 @@ import javax.validation.constraints.Min;
 
 import org.springframework.util.Assert;
 
+import com.irelint.ttt.dto.InventoryDto;
+
 @Entity
 public class Inventory {
 	@Id
@@ -26,6 +28,14 @@ public class Inventory {
 	
 	@Version
 	private int version;
+	
+	public InventoryDto toDto() {
+		InventoryDto dto = new InventoryDto();
+		dto.setGoodsId(goodsId);
+		dto.setAvailableNumber(availableNumber);
+		dto.setSelledNumber(selledNumber);
+		return dto;
+	}
 	
 	public int getVersion() {
 		return version;

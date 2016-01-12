@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,9 +17,10 @@ import com.irelint.ttt.api.AccountApi;
 import com.irelint.ttt.api.GoodsApi;
 import com.irelint.ttt.api.OrderApi;
 import com.irelint.ttt.api.UserApi;
-import com.irelint.ttt.order.Order;
-import com.irelint.ttt.order.Rating;
-import com.irelint.ttt.user.model.User;
+import com.irelint.ttt.dto.OrderDto;
+import com.irelint.ttt.dto.OrderState;
+import com.irelint.ttt.dto.RatingDto;
+import com.irelint.ttt.dto.UserDto;
 
 @Controller
 @RequestMapping("/order")
@@ -33,11 +35,11 @@ public class OrderController {
 	@RequestMapping(value="/buy/{goodsId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String buy(@PathVariable Long goodsId, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("goods", goodsService.get(goodsId));
 		model.addAttribute("addressList", userService.findAddresses(user.getId()));
 		
-		Order order = new Order();
+		OrderDto order = new OrderDto();
 		order.setNum(1);
 		order.setBuyerId(user.getId());
 		order.setGoodsId(goodsId);
@@ -47,7 +49,7 @@ public class OrderController {
 	
 	@RequestMapping(value="/create", method=RequestMethod.POST)
 	@LoginRequired
-	public String createOrder(@Valid Order order, BindingResult result, Model model, HttpSession session) {
+	public String createOrder(@Valid OrderDto order, BindingResult result, Model model, HttpSession session) {
 		if (result.hasErrors()) {
 			model.addAttribute("order", order);
 			return "order/create_order";
@@ -61,12 +63,12 @@ public class OrderController {
 	@RequestMapping(value="/pay/{orderId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String showPay(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.CONFIRMED) {
+		OrderDto order = orderService.get(orderId);
+		if (order.getState() != OrderState.CONFIRMED) {
 			return "order/pay_fail";
 		}
 		
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("account", accountService.get(user.getId()));
 		model.addAttribute("order", order);
 		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
@@ -83,8 +85,8 @@ public class OrderController {
 	@RequestMapping(value="/cancel/{orderId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String showCancel(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.CREATED && order.getState() != Order.State.CONFIRMED) {
+		OrderDto order = orderService.get(orderId);
+		if (order.getState() != OrderState.CREATED && order.getState() != OrderState.CONFIRMED) {
 			return "order/cancel_fail";
 		}
 		
@@ -96,7 +98,7 @@ public class OrderController {
 	@RequestMapping(value="/cancel/{orderId}", method=RequestMethod.POST)
 	@LoginRequired
 	public String cancel(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.cancel(orderId);
+		OrderDto order = orderService.cancel(orderId);
 		if (order == null) {
 			return "order/cancel_fail";
 		}
@@ -109,8 +111,8 @@ public class OrderController {
 	@RequestMapping(value="/deliver/{orderId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String showDeliver(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.PAYED) {
+		OrderDto order = orderService.get(orderId);
+		if (order.getState() != OrderState.PAYED) {
 			return "order/deliver_fail";
 		}
 		
@@ -122,7 +124,7 @@ public class OrderController {
 	@RequestMapping(value="/deliver/{orderId}", method=RequestMethod.POST)
 	@LoginRequired
 	public String deliver(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.deliver(orderId);
+		OrderDto order = orderService.deliver(orderId);
 		if (order == null) {
 			return "order/deliver_fail";
 		}
@@ -135,8 +137,8 @@ public class OrderController {
 	@RequestMapping(value="/refund/{orderId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String showRefund(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.PAYED && order.getState() != Order.State.DELIVERED) {
+		OrderDto order = orderService.get(orderId);
+		if (order.getState() != OrderState.PAYED && order.getState() != OrderState.DELIVERED) {
 			return "order/refund_fail";
 		}
 		
@@ -148,7 +150,7 @@ public class OrderController {
 	@RequestMapping(value="/refund/{orderId}", method=RequestMethod.POST)
 	@LoginRequired
 	public String refund(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.refund(orderId);
+		OrderDto order = orderService.refund(orderId);
 		if (order == null) {
 			return "order/refund_fail";
 		}
@@ -161,8 +163,8 @@ public class OrderController {
 	@RequestMapping(value="/receive/{orderId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String showReceive(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.DELIVERED) {
+		OrderDto order = orderService.get(orderId);
+		if (order.getState() != OrderState.DELIVERED) {
 			return "order/receive_fail";
 		}
 		
@@ -174,7 +176,7 @@ public class OrderController {
 	@RequestMapping(value="/receive/{orderId}", method=RequestMethod.POST)
 	@LoginRequired
 	public String receive(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.receive(orderId);
+		OrderDto order = orderService.receive(orderId);
 		if (order == null) {
 			return "order/receive_fail";
 		}
@@ -187,18 +189,18 @@ public class OrderController {
 	@RequestMapping(value="/rate/{orderId}", method=RequestMethod.GET)
 	@LoginRequired
 	public String showRate(@PathVariable Long orderId, Model model, HttpSession session) {
-		Order order = orderService.get(orderId);
-		if (order.getState() != Order.State.RECEIVED) {
+		OrderDto order = orderService.get(orderId);
+		if (order.getState() != OrderState.RECEIVED) {
 			return "order/rate_fail";
 		}
 		
-		Rating rating = new Rating();
+		RatingDto rating = new RatingDto();
 		rating.setGoodsId(order.getGoodsId());
 		rating.setOrderId(orderId);
-		rating.setUserId(((User)session.getAttribute("user")).getId());
-		rating.setUsername(((User)session.getAttribute("user")).getLogin());
-		model.addAttribute(rating);
-
+		rating.setUserId(((UserDto)session.getAttribute("user")).getId());
+		rating.setUsername(((UserDto)session.getAttribute("user")).getLogin());
+		
+		model.addAttribute("rating", rating);
 		model.addAttribute("order", order);
 		model.addAttribute("goods", goodsService.get(order.getGoodsId()));
 		return "order/rate";
@@ -206,7 +208,7 @@ public class OrderController {
 	
 	@RequestMapping(value="/rate", method=RequestMethod.POST)
 	@LoginRequired
-	public String rate(@Valid Rating rating, BindingResult result, Model model, HttpSession session) {
+	public String rate(@ModelAttribute("rating") @Valid RatingDto rating, BindingResult result, Model model, HttpSession session) {
 		
 		if (result.hasErrors()) {
 			model.addAttribute("order", orderService.get(rating.getOrderId()));
@@ -214,7 +216,7 @@ public class OrderController {
 			return "order/rate";
 		}
 
-		Order order = orderService.rate(rating);
+		OrderDto order = orderService.rate(rating);
 		if (order == null) {
 			return "order/rate_fail";
 		}

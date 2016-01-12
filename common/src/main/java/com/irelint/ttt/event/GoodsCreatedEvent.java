@@ -2,6 +2,8 @@ package com.irelint.ttt.event;
 
 import org.springframework.context.ApplicationEvent;
 
+import com.irelint.ttt.dto.State;
+
 public class GoodsCreatedEvent extends ApplicationEvent {
 
 	private static final long serialVersionUID = 1L;

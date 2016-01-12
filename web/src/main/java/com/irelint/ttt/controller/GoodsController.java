@@ -15,8 +15,8 @@ import com.irelint.ttt.api.GoodsApi;
 import com.irelint.ttt.api.InventoryApi;
 import com.irelint.ttt.api.OrderApi;
 import com.irelint.ttt.api.UserApi;
-import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.order.Rating;
+import com.irelint.ttt.dto.GoodsDto;
+import com.irelint.ttt.dto.RatingDto;
 
 @Controller
 @RequestMapping("/goods")
@@ -29,7 +29,7 @@ public class GoodsController {
 
 	@RequestMapping("{id}")
 	public String findGoods(@PathVariable Long id, Model model) {
-		Goods goods;
+		GoodsDto goods;
 		try {
 			goods = goodsService.get(id);
 		} catch (DataAccessException e) {
@@ -46,7 +46,7 @@ public class GoodsController {
 	private final int RATING_PAGE_SIZE = 10;
 	
 	@RequestMapping("/{id}/rating/page")
-	public @ResponseBody Page<Rating> findRatings(@PathVariable Long id, 
+	public @ResponseBody Page<RatingDto> findRatings(@PathVariable Long id, 
 			@PageableDefault(size=RATING_PAGE_SIZE) Pageable pageable, Model model) {
 		return orderService.findRatings(id, pageable);
 	}

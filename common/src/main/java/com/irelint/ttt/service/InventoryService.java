@@ -1,5 +1,6 @@
-package com.irelint.ttt.inventory;
+package com.irelint.ttt.service;
 
+import com.irelint.ttt.dto.InventoryDto;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.OrderCanceledEvent;
 import com.irelint.ttt.event.OrderCreatedEvent;
@@ -14,6 +15,6 @@ public interface InventoryService {
 
 	void add(Long goodsId, Integer number);
 
-	Inventory findByGoodsId(Long goodsId);
+	InventoryDto findByGoodsId(Long goodsId);
 
 }

@@ -1,4 +1,4 @@
-package com.irelint.ttt.event;
+package com.irelint.ttt.dto;
 
 public enum State {
 	CREATED,

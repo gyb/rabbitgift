@@ -8,10 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.irelint.ttt.goods.GoodsResult;
-import com.irelint.ttt.goods.GoodsService;
-import com.irelint.ttt.goods.model.CategoryMap;
-import com.irelint.ttt.goods.model.Goods;
+import com.irelint.ttt.dto.GoodsDto;
+import com.irelint.ttt.dto.GoodsResult;
+import com.irelint.ttt.service.GoodsService;
 
 @Service
 @Transactional
@@ -22,7 +21,7 @@ public class GoodsApi {
 	private GoodsService goodsService;
 
 	@Transactional(readOnly=true)
-	public Goods get(Long id) {
+	public GoodsDto get(Long id) {
 		return goodsService.get(id);
 	}
 	
@@ -34,27 +33,27 @@ public class GoodsApi {
 		return categoryMap.getMap();
 	}
 
-	public void create(Goods goods) {
+	public void create(GoodsDto goods) {
 		goodsService.create(goods);
 	}
 
 	@Transactional(readOnly=true)
-	public Page<Goods> findHomePage(Pageable pageable) {
+	public Page<GoodsDto> findHomePage(Pageable pageable) {
 		return goodsService.findHomePage(pageable);
 	}
 
 	@Transactional(readOnly=true)
-	public Page<Goods> findCreatedPage(Long userId, Pageable pageable) {
+	public Page<GoodsDto> findCreatedPage(Long userId, Pageable pageable) {
 		return goodsService.findCreatedPage(userId, pageable);
 	}
 
 	@Transactional(readOnly=true)
-	public Page<Goods> findOnlinePage(Long userId, Pageable pageable) {
+	public Page<GoodsDto> findOnlinePage(Long userId, Pageable pageable) {
 		return goodsService.findOnlinePage(userId, pageable);
 	}
 
 	@Transactional(readOnly=true)
-	public Page<Goods> findOfflinePage(Long userId, Pageable pageable) {
+	public Page<GoodsDto> findOfflinePage(Long userId, Pageable pageable) {
 		return goodsService.findOfflinePage(userId, pageable);
 	}
 

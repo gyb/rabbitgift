@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.irelint.ttt.dto.AddressDto;
+
 @Entity
 public class Address implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -32,6 +34,25 @@ public class Address implements Serializable {
 	@NotNull
 	@Size(min=7,max=20)
 	@Column private String phone;
+	
+	public AddressDto toDto() {
+		AddressDto dto = new AddressDto();
+		dto.setId(this.id);
+		dto.setUserId(this.userId);
+		dto.setReceiverName(this.receiverName);
+		dto.setAddress(this.address);
+		dto.setPhone(this.phone);
+		return dto;
+	}
+	
+	public static Address fromDto(AddressDto dto) {
+		Address address = new Address();
+		address.setAddress(dto.getAddress());
+		address.setPhone(dto.getPhone());
+		address.setReceiverName(dto.getReceiverName());
+		address.setUserId(dto.getUserId());
+		return address;
+	}
 	
 	public Long getUserId() {
 		return userId;

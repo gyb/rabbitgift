@@ -12,6 +12,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.irelint.ttt.dto.RatingDto;
+
 @Entity
 public class Rating implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -43,6 +45,35 @@ public class Rating implements Serializable {
 
 	private Timestamp buyTime;
 	private long buyPrice;
+	
+	public RatingDto toDto() {
+		RatingDto dto = new RatingDto();
+		dto.setGoodsId(goodsId);
+		dto.setUserId(userId);
+		dto.setUsername(username);
+		dto.setOrderId(orderId);
+		dto.setRatingTime(ratingTime);
+		dto.setBuyPrice(buyPrice);
+		dto.setBuyTime(buyTime);
+		dto.setRatingTime(ratingTime);
+		dto.setNumber(number);
+		dto.setComment(comment);
+		return dto;
+	}
+
+	public static Rating fromDto(RatingDto ratingDto) {
+		Rating rating = new Rating();
+		rating.setBuyPrice(ratingDto.getBuyPrice());
+		rating.setBuyTime(ratingDto.getBuyTime());
+		rating.setComment(ratingDto.getComment());
+		rating.setGoodsId(ratingDto.getGoodsId());
+		rating.setNumber(ratingDto.getNumber());
+		rating.setOrderId(ratingDto.getOrderId());
+		rating.setRatingTime(ratingDto.getRatingTime());
+		rating.setUserId(ratingDto.getUserId());
+		rating.setUsername(ratingDto.getUsername());
+		return rating;
+	}
 	
 	public Long getId() {
 		return id;

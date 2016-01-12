@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,9 +26,10 @@ import com.irelint.ttt.aop.LoginRequired;
 import com.irelint.ttt.api.GoodsApi;
 import com.irelint.ttt.api.InventoryApi;
 import com.irelint.ttt.api.OrderApi;
-import com.irelint.ttt.goods.GoodsResult;
-import com.irelint.ttt.goods.model.Goods;
-import com.irelint.ttt.user.model.User;
+import com.irelint.ttt.dto.GoodsDto;
+import com.irelint.ttt.dto.GoodsResult;
+import com.irelint.ttt.dto.State;
+import com.irelint.ttt.dto.UserDto;
 import com.irelint.ttt.util.ImagePathGen;
 
 @Controller
@@ -51,17 +53,17 @@ public class MyShopController {
 	@RequestMapping(value="/upload", method=RequestMethod.GET)
 	@LoginRequired
 	public String showUpload(Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
-		Goods goods = new Goods();
+		UserDto user = (UserDto)session.getAttribute("user");
+		GoodsDto goods = new GoodsDto();
 		goods.setOwnerId(user.getId());
-		model.addAttribute(goods);
+		model.addAttribute("goods", goods);
 		model.addAttribute("category", goodsService.getCategory());
 		return "myshop/upload";
 	}
 	
 	@RequestMapping(value="/upload", method=RequestMethod.POST)
 	@LoginRequired
-	public String upload(@Valid Goods goods, BindingResult result,
+	public String upload(@ModelAttribute("goods") @Valid GoodsDto goods, BindingResult result,
 			@RequestParam(value="image",required=false) MultipartFile image, 
 			Model model, HttpSession session) {
 		
@@ -84,7 +86,7 @@ public class MyShopController {
 		goods.setPicUrl(imagePathGen.getImageUrl() + fileName);
 		goodsService.create(goods);
 		
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		logger.info("user " + user.getLogin() + " upload goods " + goods.getName() + " id " + goods.getId());
 		return "myshop/upload_success";
 	}
@@ -92,7 +94,7 @@ public class MyShopController {
 	@RequestMapping(value="/createdPage")
 	@LoginRequired
 	public String createdGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("page", goodsService.findCreatedPage(user.getId(), pageable));
 		return "myshop/created";
 	}
@@ -100,7 +102,7 @@ public class MyShopController {
 	@RequestMapping(value="/goods/{goodsId}")
 	@LoginRequired
 	public String findGoods(@PathVariable Long goodsId, Model model, HttpSession session) {
-		Goods goods;
+		GoodsDto goods;
 		try {
 			goods = goodsService.get(goodsId);
 		} catch (DataAccessException e) {
@@ -111,9 +113,9 @@ public class MyShopController {
 		model.addAttribute("category", goodsService.getCategory(goods.getCategoryId()));
 		model.addAttribute("inventory", inventoryService.findByGoodsId(goodsId));
 		
-		if (goods.isOnline()) {
+		if (goods.getState() == State.ONLINE) {
 			return "myshop/online_goods";
-		} else if (goods.isNew()) {
+		} else if (goods.getState() == State.CREATED) {
 			return "myshop/created_goods";
 		} else {
 			return "myshop/offline_goods";
@@ -140,7 +142,7 @@ public class MyShopController {
 	@RequestMapping(value="/onlinePage")
 	@LoginRequired
 	public String onlineGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("page", goodsService.findOnlinePage(user.getId(), pageable));
 		return "myshop/online";
 	}
@@ -165,7 +167,7 @@ public class MyShopController {
 	@RequestMapping(value="/offlinePage")
 	@LoginRequired
 	public String offlineGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("page", goodsService.findOfflinePage(user.getId(), pageable));
 		return "myshop/offline";
 	}
@@ -198,7 +200,7 @@ public class MyShopController {
 	@RequestMapping(value="/orders", method=RequestMethod.GET) 
 	@LoginRequired
 	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		UserDto user = (UserDto)session.getAttribute("user");
 		model.addAttribute("page", orderService.findSellerOrders(user.getId(), pageable));
 		return "myshop/orders";
 	}

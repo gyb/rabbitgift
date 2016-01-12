@@ -2,8 +2,6 @@ package com.irelint.ttt.api;
 
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import com.irelint.ttt.dto.AddressDto;
 import com.irelint.ttt.dto.UserDto;
 

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;

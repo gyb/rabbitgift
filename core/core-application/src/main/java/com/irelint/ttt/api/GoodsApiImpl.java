@@ -14,58 +14,71 @@ import com.irelint.ttt.service.GoodsService;
 
 @Service
 @Transactional
-public class GoodsApi {
-	@Autowired 
+public class GoodsApiImpl implements GoodsApi {
+
+	@Autowired
 	private CategoryMap categoryMap;
-	@Autowired 
+	@Autowired
 	private GoodsService goodsService;
 
-	@Transactional(readOnly=true)
+	@Override
+	@Transactional(readOnly = true)
 	public GoodsDto get(Long id) {
 		return goodsService.get(id);
 	}
-	
+
+	@Override
 	public String getCategory(Integer categoryId) {
 		return categoryMap.getMap().get(categoryId);
 	}
-	
+
+	@Override
 	public Map<Integer, String> getCategory() {
 		return categoryMap.getMap();
 	}
 
+	@Override
 	public void create(GoodsDto goods) {
 		goodsService.create(goods);
 	}
 
-	@Transactional(readOnly=true)
+	@Override
+	@Transactional(readOnly = true)
 	public Page<GoodsDto> findHomePage(Pageable pageable) {
 		return goodsService.findHomePage(pageable);
 	}
 
-	@Transactional(readOnly=true)
+	@Override
+	@Transactional(readOnly = true)
 	public Page<GoodsDto> findCreatedPage(Long userId, Pageable pageable) {
 		return goodsService.findCreatedPage(userId, pageable);
 	}
 
-	@Transactional(readOnly=true)
+	@Override
+	@Transactional(readOnly = true)
 	public Page<GoodsDto> findOnlinePage(Long userId, Pageable pageable) {
 		return goodsService.findOnlinePage(userId, pageable);
 	}
 
-	@Transactional(readOnly=true)
+	@Override
+	@Transactional(readOnly = true)
 	public Page<GoodsDto> findOfflinePage(Long userId, Pageable pageable) {
 		return goodsService.findOfflinePage(userId, pageable);
 	}
 
+	@Override
 	public GoodsResult putOnline(Long goodsId) {
 		return goodsService.putOnline(goodsId);
 	}
 
+	@Override
 	public GoodsResult putOffline(Long goodsId) {
 		return goodsService.putOffline(goodsId);
 	}
 
+	@Override
 	public GoodsResult copy(Long goodsId) {
 		return goodsService.copy(goodsId);
 	}
+
 }

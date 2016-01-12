@@ -10,20 +10,32 @@ import com.irelint.ttt.service.AccountService;
 
 @Service
 @Transactional
-public class AccountApi {
+public class AccountApiImpl implements AccountApi {
 
 	@Autowired
 	private AccountService accountService;
 	
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.AccountApi#get(java.lang.Long)
+	 */
+	@Override
 	@Transactional(readOnly=true)
 	public AccountDto get(Long userId) {
 		return accountService.get(userId);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.AccountApi#deposit(java.lang.Long, long)
+	 */
+	@Override
 	public AccountResult deposit(Long id, long money) {
 		return accountService.deposit(id, money);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.AccountApi#withdraw(java.lang.Long, long)
+	 */
+	@Override
 	public AccountResult withdraw(Long id, long money) {
 		return accountService.withdraw(id, money);
 	}

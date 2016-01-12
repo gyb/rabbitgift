@@ -12,32 +12,56 @@ import com.irelint.ttt.service.UserService;
 
 @Service
 @Transactional
-public class UserApi {
+public class UserApiImpl implements UserApi {
 	@Autowired
 	private UserService userService;
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.UserApi#get(java.lang.Long)
+	 */
+	@Override
 	@Transactional(readOnly=true)
 	public UserDto get(Long userId) {
 		return userService.get(userId);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.UserApi#register(com.irelint.ttt.dto.UserDto)
+	 */
+	@Override
 	public UserDto register(UserDto user) {
 		return userService.register(user);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.UserApi#login(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public UserDto login(String login, String password) {
 		return userService.login(login, password);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.UserApi#findAddresses(java.lang.Long)
+	 */
+	@Override
 	@Transactional(readOnly=true)
 	public List<AddressDto> findAddresses(Long userId) {
 		return userService.findAddresses(userId);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.UserApi#saveAddress(com.irelint.ttt.dto.AddressDto)
+	 */
+	@Override
 	public void saveAddress(AddressDto address) {
 		userService.saveAddress(address);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.UserApi#deleteAddress(java.lang.Long)
+	 */
+	@Override
 	public void deleteAddress(Long addressId) {
 		userService.deleteAddress(addressId);
 	}

@@ -9,16 +9,24 @@ import com.irelint.ttt.service.InventoryService;
 
 @Service
 @Transactional
-public class InventoryApi {
+public class InventoryApiImpl implements InventoryApi {
 	
 	@Autowired
 	private InventoryService inventoryService;
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.InventoryApi#findByGoodsId(java.lang.Long)
+	 */
+	@Override
 	@Transactional(readOnly=true)
 	public InventoryDto findByGoodsId(Long goodsId) {
 		return inventoryService.findByGoodsId(goodsId);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.irelint.ttt.api.InventoryApi#add(java.lang.Long, java.lang.Integer)
+	 */
+	@Override
 	public void add(Long goodsId, Integer number) {
 		inventoryService.add(goodsId, number);
 	}

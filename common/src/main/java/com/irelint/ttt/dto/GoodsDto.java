@@ -1,11 +1,14 @@
 package com.irelint.ttt.dto;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
-public class GoodsDto {
+public class GoodsDto implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private Long id;
 	
 	private Long ownerId;

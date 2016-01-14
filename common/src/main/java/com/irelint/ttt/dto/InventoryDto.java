@@ -1,6 +1,10 @@
 package com.irelint.ttt.dto;
 
-public class InventoryDto {
+import java.io.Serializable;
+
+public class InventoryDto implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private Long goodsId;
 	private int availableNumber;
 	private int selledNumber;

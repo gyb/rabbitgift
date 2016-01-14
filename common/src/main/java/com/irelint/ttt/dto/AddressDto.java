@@ -1,7 +1,11 @@
 package com.irelint.ttt.dto;
 
+import java.io.Serializable;
 
-public class AddressDto {
+
+public class AddressDto implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private Long id;
 	private Long userId;
 	private String receiverName;

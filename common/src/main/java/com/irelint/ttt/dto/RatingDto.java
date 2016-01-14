@@ -1,8 +1,11 @@
 package com.irelint.ttt.dto;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class RatingDto {
+public class RatingDto implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	
 	private Long goodsId;
 	private Long userId;

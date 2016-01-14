@@ -1,8 +1,11 @@
 package com.irelint.ttt.dto;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class OrderHistoryDto {
+public class OrderHistoryDto implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private HistoryType type;
 	private Timestamp time;
 	private Long userId;

@@ -1,6 +1,10 @@
 package com.irelint.ttt.dto;
 
-public class AccountResult {
+import java.io.Serializable;
+
+public class AccountResult implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	public boolean result;
 	public AccountDto account;
 	

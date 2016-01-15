@@ -48,6 +48,6 @@ public class GoodsController {
 	@RequestMapping("/{id}/rating/page")
 	public @ResponseBody Page<RatingDto> findRatings(@PathVariable Long id, 
 			@PageableDefault(size=RATING_PAGE_SIZE) Pageable pageable, Model model) {
-		return orderService.findRatings(id, pageable);
+		return orderService.findRatings(id, pageable.getPageNumber(), pageable.getPageSize());
 	}
 }

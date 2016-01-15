@@ -79,7 +79,7 @@ public class MytttController {
 	@LoginRequired
 	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		UserDto user = (UserDto)session.getAttribute("user");
-		model.addAttribute("page", orderService.findBuyerOrders(user.getId(), pageable));
+		model.addAttribute("page", orderService.findBuyerOrders(user.getId(), pageable.getPageNumber(), pageable.getPageSize()));
 		return "myttt/orders";
 	}
 }

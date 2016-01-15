@@ -20,7 +20,7 @@ public class HomeController {
 	@RequestMapping(value="", method=RequestMethod.GET)
 	public String home(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model) {
 		model.addAttribute("category", goodsService.getCategory());
-		model.addAttribute("page", goodsService.findHomePage(pageable));
+		model.addAttribute("page", goodsService.findHomePage(pageable.getPageNumber(), pageable.getPageSize()));
 		return "index";
 	}
 

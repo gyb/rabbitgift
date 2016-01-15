@@ -95,7 +95,7 @@ public class MyShopController {
 	@LoginRequired
 	public String createdGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		UserDto user = (UserDto)session.getAttribute("user");
-		model.addAttribute("page", goodsService.findCreatedPage(user.getId(), pageable));
+		model.addAttribute("page", goodsService.findCreatedPage(user.getId(), pageable.getPageNumber(), pageable.getPageSize()));
 		return "myshop/created";
 	}
 	
@@ -143,7 +143,7 @@ public class MyShopController {
 	@LoginRequired
 	public String onlineGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		UserDto user = (UserDto)session.getAttribute("user");
-		model.addAttribute("page", goodsService.findOnlinePage(user.getId(), pageable));
+		model.addAttribute("page", goodsService.findOnlinePage(user.getId(), pageable.getPageNumber(), pageable.getPageSize()));
 		return "myshop/online";
 	}
 	
@@ -168,7 +168,7 @@ public class MyShopController {
 	@LoginRequired
 	public String offlineGoodsPage(@PageableDefault(size=PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		UserDto user = (UserDto)session.getAttribute("user");
-		model.addAttribute("page", goodsService.findOfflinePage(user.getId(), pageable));
+		model.addAttribute("page", goodsService.findOfflinePage(user.getId(), pageable.getPageNumber(), pageable.getPageSize()));
 		return "myshop/offline";
 	}
 	
@@ -201,7 +201,7 @@ public class MyShopController {
 	@LoginRequired
 	public String myOrders(@PageableDefault(size=ORDER_PAGE_SIZE) Pageable pageable, Model model, HttpSession session) {
 		UserDto user = (UserDto)session.getAttribute("user");
-		model.addAttribute("page", orderService.findSellerOrders(user.getId(), pageable));
+		model.addAttribute("page", orderService.findSellerOrders(user.getId(), pageable.getPageNumber(), pageable.getPageSize()));
 		return "myshop/orders";
 	}
 }

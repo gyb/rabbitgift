@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import com.irelint.ttt.dto.HistoryType;
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;
 import com.irelint.ttt.dto.OrderState;
+import com.irelint.ttt.dto.PageDto;
 import com.irelint.ttt.dto.RatingDto;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.GoodsRatedEvent;
@@ -91,11 +93,10 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<OrderDto> findBuyerOrders(final Long userId, Pageable pageable) {
+	public PageDto<OrderDto> findBuyerOrders(final Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Order> page = orderDao.findByBuyerId(userId, pageable);
-		return new PageImpl<OrderDto>(
-				page.getContent().stream().map(o -> o.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+		return new PageDto<OrderDto>(page.map(o -> o.toDto()));
 	}
 	
 	/* (non-Javadoc)
@@ -141,11 +142,10 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<OrderDto> findSellerOrders(final Long userId, Pageable pageable) {
+	public PageDto<OrderDto> findSellerOrders(final Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Order> page = orderDao.findBySellerId(userId, pageable);
-		return new PageImpl<OrderDto>(
-				page.getContent().stream().map(o -> o.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+		return new PageDto<OrderDto>(page.map(o -> o.toDto()));
 	}
 	
 	/* (non-Javadoc)
@@ -258,10 +258,10 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<RatingDto> findRatings(final Long goodsId, Pageable pageable) {
+	public PageDto<RatingDto> findRatings(final Long goodsId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Rating> page = ratingDao.findByGoodsId(goodsId, pageable);
-		return new PageImpl<RatingDto>(page.getContent().stream().map(r -> r.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+		return new PageDto<RatingDto>(page.map(r -> r.toDto()));
 	}
 	
 	@Override

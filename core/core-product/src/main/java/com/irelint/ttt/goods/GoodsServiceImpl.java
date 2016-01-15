@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.aop.OptimisticLockRetry;
 import com.irelint.ttt.dto.GoodsDto;
 import com.irelint.ttt.dto.GoodsResult;
+import com.irelint.ttt.dto.PageDto;
 import com.irelint.ttt.dto.State;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.GoodsRatedEvent;
@@ -48,11 +50,12 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<GoodsDto> findCreatedPage(final Long userId, Pageable pageable) {
+	public PageDto<GoodsDto> findCreatedPage(final Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Goods> page = dao.findByOwnerIdAndState(userId, State.CREATED, pageable);
-		return new PageImpl<GoodsDto>(
+		return new PageDto<GoodsDto>(new PageImpl<GoodsDto>(
 				page.getContent().stream().map(g -> g.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+				pageable, page.getTotalElements()));
 	}
 	
 	/* (non-Javadoc)
@@ -85,11 +88,10 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<GoodsDto> findOnlinePage(final Long userId, Pageable pageable) {
+	public PageDto<GoodsDto> findOnlinePage(final Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Goods> page = dao.findByOwnerIdAndState(userId, State.ONLINE, pageable);
-		return new PageImpl<GoodsDto>(
-				page.getContent().stream().map(g -> g.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+		return new PageDto<GoodsDto>(page.map(goods -> goods.toDto()));
 	}
 	
 	/* (non-Javadoc)
@@ -112,11 +114,10 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<GoodsDto> findOfflinePage(final Long userId, Pageable pageable) {
+	public PageDto<GoodsDto> findOfflinePage(final Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Goods> page = dao.findByOwnerIdAndState(userId, State.OFFLINE, pageable);
-		return new PageImpl<GoodsDto>(
-				page.getContent().stream().map(g -> g.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+		return new PageDto<GoodsDto>(page.map(g -> g.toDto()));
 	}
 
 	/* (non-Javadoc)
@@ -141,11 +142,10 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public Page<GoodsDto> findHomePage(Pageable pageable) {
+	public PageDto<GoodsDto> findHomePage(int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
 		Page<Goods> page = dao.findByState(State.ONLINE, pageable);
-		return new PageImpl<GoodsDto>(
-				page.getContent().stream().map(g -> g.toDto()).collect(Collectors.toList()),
-				pageable, page.getTotalElements());
+		return new PageDto<GoodsDto>(page.map(g -> g.toDto()));
 }
 
 	@Override

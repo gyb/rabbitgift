@@ -1,31 +1,29 @@
 package com.irelint.ttt.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.irelint.ttt.dto.GoodsDto;
 import com.irelint.ttt.dto.GoodsResult;
+import com.irelint.ttt.dto.PageDto;
 import com.irelint.ttt.event.GoodsRatedEvent;
 
 public interface GoodsService {
 
 	void create(GoodsDto goods);
 
-	Page<GoodsDto> findCreatedPage(Long userId, Pageable pageable);
+	PageDto<GoodsDto> findCreatedPage(Long userId, int page, int size);
 
 	GoodsDto get(Long goodsId);
 
 	GoodsResult putOnline(Long goodsId);
 
-	Page<GoodsDto> findOnlinePage(Long userId, Pageable pageable);
+	PageDto<GoodsDto> findOnlinePage(Long userId, int page, int size);
 
 	GoodsResult putOffline(Long goodsId);
 
-	Page<GoodsDto> findOfflinePage(Long userId, Pageable pageable);
+	PageDto<GoodsDto> findOfflinePage(Long userId, int page, int size);
 
 	GoodsResult copy(Long goodsId);
 
-	Page<GoodsDto> findHomePage(Pageable pageable);
+	PageDto<GoodsDto> findHomePage(int page, int size);
 
 	void addRating(GoodsRatedEvent event);
 }

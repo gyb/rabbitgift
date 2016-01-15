@@ -16,13 +16,13 @@ public interface GoodsApi {
 
 	GoodsResult putOnline(Long goodsId);
 
-	Page<GoodsDto> findOfflinePage(Long userId, Pageable pageable);
+	Page<GoodsDto> findOfflinePage(Long userId, int page, int size);
 
-	Page<GoodsDto> findOnlinePage(Long userId, Pageable pageable);
+	Page<GoodsDto> findOnlinePage(Long userId, int page, int size);
 
-	Page<GoodsDto> findCreatedPage(Long userId, Pageable pageable);
+	Page<GoodsDto> findCreatedPage(Long userId, int page, int size);
 
-	Page<GoodsDto> findHomePage(Pageable pageable);
+	Page<GoodsDto> findHomePage(int page, int size);
 
 	void create(GoodsDto goods);
 

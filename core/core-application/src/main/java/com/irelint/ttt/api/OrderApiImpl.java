@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +48,9 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findSellerOrders(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	public Page<OrderDto> findSellerOrders(Long userId, Pageable pageable) {
-		Page<OrderDto> page = orderService.findSellerOrders(userId, pageable);
+	public Page<OrderDto> findSellerOrders(Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
+		Page<OrderDto> page = orderService.findSellerOrders(userId, number, size);
 		List<OrderDto> dtos = page.getContent().stream()
 				.map(dto -> {
 					dto.setBuyer(userService.get(dto.getBuyerId()));
@@ -63,8 +65,9 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findBuyerOrders(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	public Page<OrderDto> findBuyerOrders(Long userId, Pageable pageable) {
-		Page<OrderDto> page = orderService.findBuyerOrders(userId, pageable);
+	public Page<OrderDto> findBuyerOrders(Long userId, int number, int size) {
+		Pageable pageable = new PageRequest(number, size);
+		Page<OrderDto> page = orderService.findBuyerOrders(userId, number, size);
 		List<OrderDto> dtos = page.getContent().stream()
 				.map(dto -> {
 					dto.setSeller(userService.get(dto.getSellerId()));
@@ -79,8 +82,8 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findRatings(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	public Page<RatingDto> findRatings(Long goodsId, Pageable pageable) {
-		return orderService.findRatings(goodsId, pageable);
+	public Page<RatingDto> findRatings(Long goodsId, int page, int size) {
+		return orderService.findRatings(goodsId, page, size);
 	}
 
 	/* (non-Javadoc)

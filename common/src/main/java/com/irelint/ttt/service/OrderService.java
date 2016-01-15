@@ -2,11 +2,9 @@ package com.irelint.ttt.service;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;
+import com.irelint.ttt.dto.PageDto;
 import com.irelint.ttt.dto.RatingDto;
 import com.irelint.ttt.event.GoodsCreatedEvent;
 import com.irelint.ttt.event.GoodsUpdatedEvent;
@@ -19,7 +17,7 @@ public interface OrderService {
 
 	void confirmed(OrderConfirmedEvent event);
 
-	Page<OrderDto> findBuyerOrders(Long userId, Pageable pageable);
+	PageDto<OrderDto> findBuyerOrders(Long userId, int page, int size);
 
 	OrderDto get(Long orderId);
 
@@ -27,7 +25,7 @@ public interface OrderService {
 
 	void pay(OrderPayedEvent event);
 
-	Page<OrderDto> findSellerOrders(Long userId, Pageable pageable);
+	PageDto<OrderDto> findSellerOrders(Long userId, int page, int size);
 
 	OrderDto cancel(Long orderId);
 
@@ -41,7 +39,7 @@ public interface OrderService {
 
 	List<OrderHistoryDto> history(Long orderId);
 
-	Page<RatingDto> findRatings(Long goodsId, Pageable pageable);
+	PageDto<RatingDto> findRatings(Long goodsId, int page, int size);
 
 	void createGoods(GoodsCreatedEvent event);
 	

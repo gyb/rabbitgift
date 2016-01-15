@@ -15,11 +15,11 @@ public interface OrderApi {
 
 	OrderDto create(OrderDto order);
 
-	Page<OrderDto> findSellerOrders(Long userId, Pageable pageable);
+	Page<OrderDto> findSellerOrders(Long userId, int page, int size);
 
-	Page<OrderDto> findBuyerOrders(Long userId, Pageable pageable);
+	Page<OrderDto> findBuyerOrders(Long userId, int page, int size);
 
-	Page<RatingDto> findRatings(Long goodsId, Pageable pageable);
+	Page<RatingDto> findRatings(Long goodsId, int page, int size);
 
 	void pay(Long orderId);
 

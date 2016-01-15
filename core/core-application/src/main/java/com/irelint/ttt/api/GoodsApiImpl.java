@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.DubboService;
@@ -42,23 +41,23 @@ public class GoodsApiImpl implements GoodsApi {
 	}
 
 	@Override
-	public Page<GoodsDto> findHomePage(Pageable pageable) {
-		return goodsService.findHomePage(pageable);
+	public Page<GoodsDto> findHomePage(int page, int size) {
+		return goodsService.findHomePage(page, size);
 	}
 
 	@Override
-	public Page<GoodsDto> findCreatedPage(Long userId, Pageable pageable) {
-		return goodsService.findCreatedPage(userId, pageable);
+	public Page<GoodsDto> findCreatedPage(Long userId, int page, int size) {
+		return goodsService.findCreatedPage(userId, page, size);
 	}
 
 	@Override
-	public Page<GoodsDto> findOnlinePage(Long userId, Pageable pageable) {
-		return goodsService.findOnlinePage(userId, pageable);
+	public Page<GoodsDto> findOnlinePage(Long userId, int page, int size) {
+		return goodsService.findOnlinePage(userId, page, size);
 	}
 
 	@Override
-	public Page<GoodsDto> findOfflinePage(Long userId, Pageable pageable) {
-		return goodsService.findOfflinePage(userId, pageable);
+	public Page<GoodsDto> findOfflinePage(Long userId, int page, int size) {
+		return goodsService.findOfflinePage(userId, page, size);
 	}
 
 	@Override

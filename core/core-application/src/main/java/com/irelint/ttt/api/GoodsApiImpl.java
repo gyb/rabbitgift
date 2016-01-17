@@ -3,12 +3,12 @@ package com.irelint.ttt.api;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.GoodsDto;
 import com.irelint.ttt.dto.GoodsResult;
+import com.irelint.ttt.dto.PageDto;
 import com.irelint.ttt.service.GoodsService;
 
 @Service
@@ -41,22 +41,22 @@ public class GoodsApiImpl implements GoodsApi {
 	}
 
 	@Override
-	public Page<GoodsDto> findHomePage(int page, int size) {
+	public PageDto<GoodsDto> findHomePage(int page, int size) {
 		return goodsService.findHomePage(page, size);
 	}
 
 	@Override
-	public Page<GoodsDto> findCreatedPage(Long userId, int page, int size) {
+	public PageDto<GoodsDto> findCreatedPage(Long userId, int page, int size) {
 		return goodsService.findCreatedPage(userId, page, size);
 	}
 
 	@Override
-	public Page<GoodsDto> findOnlinePage(Long userId, int page, int size) {
+	public PageDto<GoodsDto> findOnlinePage(Long userId, int page, int size) {
 		return goodsService.findOnlinePage(userId, page, size);
 	}
 
 	@Override
-	public Page<GoodsDto> findOfflinePage(Long userId, int page, int size) {
+	public PageDto<GoodsDto> findOfflinePage(Long userId, int page, int size) {
 		return goodsService.findOfflinePage(userId, page, size);
 	}
 

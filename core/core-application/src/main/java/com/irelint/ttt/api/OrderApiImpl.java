@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.dubbo.config.annotation.DubboService;
 import com.irelint.ttt.dto.OrderDto;
 import com.irelint.ttt.dto.OrderHistoryDto;
+import com.irelint.ttt.dto.PageDto;
 import com.irelint.ttt.dto.RatingDto;
 import com.irelint.ttt.service.GoodsService;
 import com.irelint.ttt.service.OrderService;
@@ -48,41 +49,35 @@ public class OrderApiImpl implements OrderApi {
 	 * @see com.irelint.ttt.api.OrderApi#findSellerOrders(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	public Page<OrderDto> findSellerOrders(Long userId, int number, int size) {
-		Pageable pageable = new PageRequest(number, size);
-		Page<OrderDto> page = orderService.findSellerOrders(userId, number, size);
-		List<OrderDto> dtos = page.getContent().stream()
-				.map(dto -> {
-					dto.setBuyer(userService.get(dto.getBuyerId()));
-					dto.setGoods(goodsService.get(dto.getGoodsId()));
-					return dto;
-				})
-				.collect(Collectors.toList());
-		return new PageImpl<OrderDto>(dtos, pageable, page.getTotalElements());
+	public PageDto<OrderDto> findSellerOrders(Long userId, int number, int size) {
+		return new PageDto<OrderDto>(
+				orderService.findSellerOrders(userId, number, size).map(
+						dto -> {
+							dto.setBuyer(userService.get(dto.getBuyerId()));
+							dto.setGoods(goodsService.get(dto.getGoodsId()));
+							return dto;
+						}));
 	}
 
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.api.OrderApi#findBuyerOrders(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	public Page<OrderDto> findBuyerOrders(Long userId, int number, int size) {
-		Pageable pageable = new PageRequest(number, size);
-		Page<OrderDto> page = orderService.findBuyerOrders(userId, number, size);
-		List<OrderDto> dtos = page.getContent().stream()
-				.map(dto -> {
-					dto.setSeller(userService.get(dto.getSellerId()));
-					dto.setGoods(goodsService.get(dto.getGoodsId()));
-					return dto;
-				})
-				.collect(Collectors.toList());
-		return new PageImpl<OrderDto>(dtos, pageable, page.getTotalElements());
+	public PageDto<OrderDto> findBuyerOrders(Long userId, int number, int size) {
+		return new PageDto<OrderDto>(
+				orderService.findBuyerOrders(userId, number, size).map(
+						dto -> {
+							dto.setSeller(userService.get(dto.getSellerId()));
+							dto.setGoods(goodsService.get(dto.getGoodsId()));
+							return dto;
+						}));
 	}
 	
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.api.OrderApi#findRatings(java.lang.Long, org.springframework.data.domain.Pageable)
 	 */
 	@Override
-	public Page<RatingDto> findRatings(Long goodsId, int page, int size) {
+	public PageDto<RatingDto> findRatings(Long goodsId, int page, int size) {
 		return orderService.findRatings(goodsId, page, size);
 	}
 

@@ -1,15 +1,14 @@
 package com.irelint.ttt.event;
 
-import org.springframework.context.ApplicationEvent;
+import java.io.Serializable;
 
-public class OrderPayedEvent extends ApplicationEvent {
+public class OrderPayedEvent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private Long orderId;
 
-	public OrderPayedEvent(Object source, Long orderId) {
-		super(source);
+	public OrderPayedEvent(Long orderId) {
 		this.orderId = orderId;
 	}
 

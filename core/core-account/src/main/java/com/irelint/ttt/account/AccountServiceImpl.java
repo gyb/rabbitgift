@@ -2,10 +2,9 @@ package com.irelint.ttt.account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,16 +18,19 @@ import com.irelint.ttt.event.ToPayOrderEvent;
 import com.irelint.ttt.event.ToRefundOrderEvent;
 import com.irelint.ttt.event.UserCreatedEvent;
 import com.irelint.ttt.service.AccountService;
+import com.irelint.ttt.util.Constants;
 
 @Service
 @Transactional
 @DubboService(interfaceClass = AccountService.class)
-public class AccountServiceImpl implements AccountService, ApplicationEventPublisherAware {
+public class AccountServiceImpl implements AccountService {
 	private final static Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 	
-	@Autowired private AccountDao dao;
+	@Autowired 
+	private AccountDao dao;
 	
-	private ApplicationEventPublisher publisher;
+	@Autowired
+	private AmqpTemplate amqpTemplate;
 	
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.account.AccountService#get(java.lang.Long)
@@ -43,7 +45,7 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 	 * @see com.irelint.ttt.account.AccountService#createAccount(com.irelint.ttt.event.UserCreatedEvent)
 	 */
 	@Override
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_USERCREATED_ACCOUNT)
 	public void createAccount(UserCreatedEvent event) {
 		dao.save(new Account(event.getUserId()));
 	}
@@ -84,19 +86,19 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 
 	@Override
 	@OptimisticLockRetry
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_TOPAYORDER_ACCOUNT)
 	public void pay(ToPayOrderEvent event) {
 		Account account = dao.findOne(event.getOrderBuyerId());
 		if (!account.freeze(event.getOrderMoney())) {
 			return;
 		}
 		
-		publisher.publishEvent(new OrderPayedEvent(this, event.getOrderId()));
+		amqpTemplate.convertAndSend("ttt-exchange", "event.orderPayed", new OrderPayedEvent(event.getOrderId()));
 	}
 
 	@Override
 	@OptimisticLockRetry
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_TOREFUNDORDER_ACCOUNT)
 	public void refund(ToRefundOrderEvent event) {
 		Account account = dao.findOne(event.getOrderBuyerId());
 		account.refund(event.getOrderMoney());
@@ -104,7 +106,7 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 
 	@Override
 	@OptimisticLockRetry
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_ORDERRECEIVED_ACCOUNT)
 	public void confirm(OrderReceivedEvent event) {
 		Account buyer = dao.findOne(event.getOrderBuyerId());
 		buyer.confirmPay(event.getOrderMoney());
@@ -112,8 +114,4 @@ public class AccountServiceImpl implements AccountService, ApplicationEventPubli
 		seller.receivePay(event.getOrderMoney());
 	}
 
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
 }

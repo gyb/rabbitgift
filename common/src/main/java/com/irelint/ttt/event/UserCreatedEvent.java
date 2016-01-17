@@ -1,15 +1,14 @@
 package com.irelint.ttt.event;
 
-import org.springframework.context.ApplicationEvent;
+import java.io.Serializable;
 
-public class UserCreatedEvent extends ApplicationEvent {
+public class UserCreatedEvent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Long userId;
 	
-	public UserCreatedEvent(Object source, Long userId) {
-		super(source);
+	public UserCreatedEvent(Long userId) {
 		this.userId = userId;
 	}
 	

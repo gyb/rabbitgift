@@ -6,12 +6,10 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,10 +34,11 @@ import com.irelint.ttt.event.OrderReceivedEvent;
 import com.irelint.ttt.event.ToPayOrderEvent;
 import com.irelint.ttt.event.ToRefundOrderEvent;
 import com.irelint.ttt.service.OrderService;
+import com.irelint.ttt.util.Constants;
 
 @Service
 @DubboService(interfaceClass=OrderService.class)
-public class OrderServiceImpl implements OrderService, ApplicationEventPublisherAware {
+public class OrderServiceImpl implements OrderService {
 	private final static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 	
 	@Autowired 
@@ -50,9 +49,9 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	private OrderHistoryDao orderHistoryDao;
 	@Autowired
 	private RatingDao ratingDao;
+	@Autowired
+	private AmqpTemplate amqpTemplate;
 	
-	private ApplicationEventPublisher publisher;
-
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.order.OrderService#create(com.irelint.ttt.order.Order)
 	 */
@@ -70,7 +69,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 		orderDao.save(order);
 		orderHistoryDao.save(OrderHistory.newCreate(order));
 		
-		publisher.publishEvent(new OrderCreatedEvent(this, order.getId(), order.getGoodsId(), order.getNum()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_ORDERCREATED,
+				new OrderCreatedEvent(order.getId(), order.getGoodsId(), order.getNum()));
 		
 		return order.toDto();
 	}
@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_ORDERCONFIRMED_ORDER)
 	public void confirmed(OrderConfirmedEvent event) {
 		Order order = orderDao.findOne(event.getOrderId());
 		order.confirm();
@@ -119,7 +119,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 			return;
 		}
 		
-		publisher.publishEvent(new ToPayOrderEvent(this, orderId, order.getBuyerId(), order.getMoney()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_TOPAYORDER,
+				new ToPayOrderEvent(orderId, order.getBuyerId(), order.getMoney()));
 		logger.debug("publish ToPayOrderEvent [{}, {}, {}]", orderId, order.getBuyerId(), order.getMoney());
 	}
 	
@@ -128,7 +129,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	 */
 	@Override
 	@Transactional
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_ORDERPAYED_ORDER)
 	public void pay(OrderPayedEvent event) {
 		Order order = orderDao.findOne(event.getOrderId());
 		order.pay();
@@ -160,7 +161,9 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 
 		order.cancel();
 		orderHistoryDao.save(OrderHistory.newCancel(order));
-		publisher.publishEvent(new OrderCanceledEvent(this, order.getId(), order.getGoodsId(), order.getNum()));
+
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_ORDERCANCELED,
+				new OrderCanceledEvent(order.getId(), order.getGoodsId(), order.getNum()));
 		
 		return order.toDto();
 	}
@@ -195,7 +198,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 		order.refund();
 		orderHistoryDao.save(OrderHistory.newRefund(order));
 		
-		publisher.publishEvent(new ToRefundOrderEvent(this, order.getId(), order.getBuyerId(), order.getMoney()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_TOREFUNDORDER,
+				new ToRefundOrderEvent(order.getId(), order.getBuyerId(), order.getMoney()));
 		
 		return order.toDto();
 	}
@@ -213,7 +217,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 		order.receive();
 		orderHistoryDao.save(OrderHistory.newReceive(order));
 
-		publisher.publishEvent(new OrderReceivedEvent(this, order.getId(), order.getBuyerId(), order.getSellerId(), order.getMoney()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_ORDERRECEIVED,
+				new OrderReceivedEvent(order.getId(), order.getBuyerId(), order.getSellerId(), order.getMoney()));
 		
 		return order.toDto();
 	}
@@ -235,7 +240,8 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 		rating.setBuyTime(created.getTime());
 		ratingDao.save(rating);
 		
-		publisher.publishEvent(new GoodsRatedEvent(this, order.getGoodsId(), rating.getNumber()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSCREATED,
+				new GoodsRatedEvent(order.getGoodsId(), rating.getNumber()));
 		
 		order.complete();
 		orderHistoryDao.save(OrderHistory.newComplete(order));
@@ -266,7 +272,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 	
 	@Override
 	@Transactional
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_GOODSCREATED_ORDER)
 	public void createGoods(GoodsCreatedEvent event) {
 		OrderGoods goods = new OrderGoods();
 		goods.setId(event.getGoodsId());
@@ -278,15 +284,11 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 
 	@Override
 	@Transactional
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_GOODSUPDATED_ORDER)
 	public void updateGoods(GoodsUpdatedEvent event) {
 		OrderGoods goods = orderGoodsDao.findOne(event.getGoodsId());
 		goods.setPrice(event.getPrice());
 		goods.setState(event.getState());
 	}
 
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
 }

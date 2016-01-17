@@ -1,10 +1,10 @@
 package com.irelint.ttt.event;
 
-import org.springframework.context.ApplicationEvent;
+import java.io.Serializable;
 
 import com.irelint.ttt.dto.State;
 
-public class GoodsUpdatedEvent extends ApplicationEvent {
+public class GoodsUpdatedEvent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -14,8 +14,7 @@ public class GoodsUpdatedEvent extends ApplicationEvent {
 	
 	private State state;
 
-	public GoodsUpdatedEvent(Object source, Long goodsId, long price, State state) {
-		super(source);
+	public GoodsUpdatedEvent(Long goodsId, long price, State state) {
 		this.goodsId = goodsId;
 		this.price = price;
 		this.state = state;

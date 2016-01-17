@@ -1,9 +1,8 @@
 package com.irelint.ttt.inventory;
 
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,22 +14,23 @@ import com.irelint.ttt.event.OrderCanceledEvent;
 import com.irelint.ttt.event.OrderConfirmedEvent;
 import com.irelint.ttt.event.OrderCreatedEvent;
 import com.irelint.ttt.service.InventoryService;
+import com.irelint.ttt.util.Constants;
 
 @Service
 @Transactional
 @DubboService(interfaceClass=InventoryService.class)
-public class InventoryServiceImpl implements ApplicationEventPublisherAware, InventoryService {
+public class InventoryServiceImpl implements InventoryService {
 	
 	@Autowired
 	private InventoryDao dao;
-	
-	private ApplicationEventPublisher publisher;
+	@Autowired
+	private AmqpTemplate amqpTemplate;
 
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.inventory.InventoryService#initInventory(com.irelint.ttt.event.GoodsCreatedEvent)
 	 */
 	@Override
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_GOODSCREATED_INVENTORY)
 	public void initInventory(GoodsCreatedEvent event) {
 		Inventory inventory = new Inventory();
 		inventory.setGoodsId(event.getGoodsId());
@@ -41,12 +41,13 @@ public class InventoryServiceImpl implements ApplicationEventPublisherAware, Inv
 	 * @see com.irelint.ttt.inventory.InventoryService#orderCreated(com.irelint.ttt.event.OrderCreatedEvent)
 	 */
 	@Override
-	@EventListener
 	@OptimisticLockRetry
+	@RabbitListener(queues=Constants.QUEUE_ORDERCREATED_INVENTORY)
 	public void orderCreated(OrderCreatedEvent event) {
 		Inventory inventory = dao.findByGoodsId(event.getGoodsId());
 		if (inventory.sell(event.getGoodsNumber())) {
-			publisher.publishEvent(new OrderConfirmedEvent(this, event.getOrderId()));
+			amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_ORDERCONFIRMED,
+					new OrderConfirmedEvent(event.getOrderId()));
 		}
 	}
 	
@@ -54,8 +55,8 @@ public class InventoryServiceImpl implements ApplicationEventPublisherAware, Inv
 	 * @see com.irelint.ttt.inventory.InventoryService#orderCanceled(com.irelint.ttt.event.OrderCanceledEvent)
 	 */
 	@Override
-	@EventListener
 	@OptimisticLockRetry
+	@RabbitListener(queues=Constants.QUEUE_ORDERCANCELED_INVENTORY)
 	public void orderCanceled(OrderCanceledEvent event) {
 		Inventory inventory = dao.findByGoodsId(event.getGoodsId());
 		inventory.cancel(event.getGoodsNumber());
@@ -80,8 +81,4 @@ public class InventoryServiceImpl implements ApplicationEventPublisherAware, Inv
 		return dao.findByGoodsId(goodsId).toDto();
 	}
 
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
 }

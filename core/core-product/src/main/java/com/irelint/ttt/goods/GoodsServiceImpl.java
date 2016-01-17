@@ -3,10 +3,9 @@ package com.irelint.ttt.goods;
 
 import java.util.stream.Collectors;
 
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +24,15 @@ import com.irelint.ttt.event.GoodsRatedEvent;
 import com.irelint.ttt.event.GoodsUpdatedEvent;
 import com.irelint.ttt.goods.model.Goods;
 import com.irelint.ttt.service.GoodsService;
+import com.irelint.ttt.util.Constants;
 
 @Service
 @DubboService(interfaceClass=GoodsService.class)
-public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisherAware {
+public class GoodsServiceImpl implements GoodsService {
 	@Autowired 
 	private GoodsDao dao;
-	
-	private ApplicationEventPublisher publisher;
+	@Autowired
+	private AmqpTemplate amqpTemplate;
 	
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.goods.service.GoodsServic#create(com.irelint.ttt.goods.model.Goods)
@@ -42,7 +42,8 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 	public void create(GoodsDto dto) {
 		Goods goods = Goods.fromDto(dto);
 		dao.save(goods);
-		publisher.publishEvent(new GoodsCreatedEvent(this, goods.getId(), goods.getOwnerId(), goods.getPrice(), State.CREATED));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSCREATED,
+				new GoodsCreatedEvent(goods.getId(), goods.getOwnerId(), goods.getPrice(), State.CREATED));
 	}
 
 	/* (non-Javadoc)
@@ -79,7 +80,8 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 			return GoodsResult.fail(goods.toDto());
 		}
 		
-		publisher.publishEvent(new GoodsUpdatedEvent(this, goodsId, goods.getPrice(), goods.getState()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSUPDATED,
+				new GoodsUpdatedEvent(goodsId, goods.getPrice(), goods.getState()));
 		return GoodsResult.success(goods.toDto());
 	}
 
@@ -105,7 +107,8 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 			return GoodsResult.fail(goods.toDto());
 		}
 
-		publisher.publishEvent(new GoodsUpdatedEvent(this, goodsId, goods.getPrice(), goods.getState()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSUPDATED,
+				new GoodsUpdatedEvent(goodsId, goods.getPrice(), goods.getState()));
 		return GoodsResult.success(goods.toDto());
 	}
 
@@ -133,7 +136,8 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 		
 		Goods copy = goods.createCopy();
 		dao.save(copy);
-		publisher.publishEvent(new GoodsCreatedEvent(this, copy.getId(), copy.getOwnerId(), copy.getPrice(), State.CREATED));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSCREATED,
+				new GoodsCreatedEvent(copy.getId(), copy.getOwnerId(), copy.getPrice(), State.CREATED));
 		return GoodsResult.success(copy.toDto());
 	}
 	
@@ -150,14 +154,10 @@ public class GoodsServiceImpl implements GoodsService, ApplicationEventPublisher
 
 	@Override
 	@Transactional
-	@EventListener
+	@RabbitListener(queues=Constants.QUEUE_GOODSRATED_GOODS)
 	public void addRating(GoodsRatedEvent event) {
 		Goods goods = dao.findOne(event.getGoodsId());
 		goods.addRating(event.getRatingNumber());
 	}
 
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
 }

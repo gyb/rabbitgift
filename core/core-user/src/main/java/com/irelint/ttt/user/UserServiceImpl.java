@@ -4,9 +4,8 @@ package com.irelint.ttt.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,18 +20,19 @@ import com.irelint.ttt.user.dao.AddressDao;
 import com.irelint.ttt.user.dao.UserDao;
 import com.irelint.ttt.user.model.Address;
 import com.irelint.ttt.user.model.User;
+import com.irelint.ttt.util.Constants;
 
 
 @Service
 @DubboService(interfaceClass = UserService.class)
-public class UserServiceImpl implements UserService, ApplicationEventPublisherAware {
+public class UserServiceImpl implements UserService {
 	@Autowired 
 	private UserDao userDao;
 	@Autowired 
 	private AddressDao addressDao;
+	@Autowired
+	private AmqpTemplate amqpTemplate;
 	
-	private ApplicationEventPublisher publisher;
-
 	/* (non-Javadoc)
 	 * @see com.irelint.ttt.user.UserService#register(com.irelint.ttt.user.User)
 	 */
@@ -47,7 +47,8 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 		
 		User user = User.fromDto(dto);
 		userDao.save(user);
-		publisher.publishEvent(new UserCreatedEvent(this, user.getId()));
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_USERCREATED, 
+				new UserCreatedEvent(user.getId()));
 
 		return user.toDto();
 	}
@@ -106,8 +107,4 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 		addressDao.delete(addressId);
 	}
 
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
 }

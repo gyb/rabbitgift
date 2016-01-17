@@ -4,17 +4,16 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.servlet.ServletConfig;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.ServletConfigAware;
 
 @Lazy(false)
 @Component
-public class ImagePathGen implements ServletConfigAware {
+public class ImagePathGen {
 	private final static Logger logger = LoggerFactory.getLogger(ImagePathGen.class);
 	private String basePath;
 	private static final String baseUrl = "/resources/upload/";
@@ -22,9 +21,8 @@ public class ImagePathGen implements ServletConfigAware {
 	private String uploadUrl;
 	private AtomicLong next = new AtomicLong(System.currentTimeMillis() % (60 * 60 * 1000));
 	
-	@Override
-	public void setServletConfig(ServletConfig config) {
-		basePath = config.getServletContext().getRealPath("/") + "resources/upload/";
+	public ImagePathGen() {
+		basePath = ImagePathGen.class.getResource("/static/resources/upload/").getPath();
 		createUploadPath();
 	}
 

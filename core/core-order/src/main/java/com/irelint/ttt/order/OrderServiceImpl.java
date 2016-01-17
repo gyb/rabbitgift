@@ -240,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
 		rating.setBuyTime(created.getTime());
 		ratingDao.save(rating);
 		
-		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSCREATED,
+		amqpTemplate.convertAndSend(Constants.EXCHANGE_NAME, Constants.EVENT_GOODSRATED,
 				new GoodsRatedEvent(order.getGoodsId(), rating.getNumber()));
 		
 		order.complete();

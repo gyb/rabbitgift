@@ -5,12 +5,18 @@ rabbitgift
 
 使用
 ----
-//TODO
+首先去 https://github.com/gyb/dubbo 安装3.0.0-SNAPSHOT版本的Dubbo二进制的包
+cd dubbo
+mvn clean install -DskipTests
 
+然后运行
 mvn clean install
+然后分别运行每个服务
+cd core/xxx
+mvn clean spring-boot:run
 
+最后
 cd web
-
-mvn tomcat7:run
+mvn clean spring-boot:run
 
 访问 http://localhost:8080/

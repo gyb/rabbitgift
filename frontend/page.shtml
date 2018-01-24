@@ -1,0 +1,5 @@
+<div id="page">
+<a href="#" onclick="">&lt;&lt;上页</a>
+ 总3页 第<input value="1" id="currentPageNo"/>页 <input type="button" value="go" onclick=""/>
+<a href="#" onclick="">下页&gt;&gt;</a>
+</div>

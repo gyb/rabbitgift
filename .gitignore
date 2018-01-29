@@ -1,3 +1,2 @@
-ttt-front/mvnw.cmd
-ttt-front/mvnw
-ttt-front/.mvn/
+*/.mvn/
+mvnw*
